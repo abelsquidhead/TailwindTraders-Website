@@ -25,9 +25,9 @@ jobs:
     - name: Setup MSBuild.exe
       uses: warrenbuckley/Setup-MSBuild@v1
       
-    # create staging directory
-    - name: Create staging directory
-      run: mkdir staging
+    # build solution
+    - name: build solution
+      run: msbuild ./Source/Tailwind.Traders.Web.sln /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="%GITHUB_WORKSPACE%\staging"'
     
     # upload build artifact
     - name: publish build artifacts back to GitHub
