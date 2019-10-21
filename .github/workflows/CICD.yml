@@ -28,6 +28,15 @@ jobs:
     # build solution
     - name: build solution
       run: msbuild ./Source/Tailwind.Traders.Web.sln /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="%GITHUB_WORKSPACE%\staging"'
+        
+    # find zip file
+    - name: find zip
+      run: |
+        pwd
+        ls
+        cd staging
+        ls
+        pwd
     
     # upload build artifact
     - name: publish build artifacts back to GitHub
