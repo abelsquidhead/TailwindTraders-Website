@@ -78,5 +78,5 @@ jobs:
         uses: azure/appservice-actions/webapp@master
         with:
           app-name: abeltailwindtraders  # Replace with your app name
-          package: webapp/webapp.zip  # Specify the folder or file to deploy
+          package: webapp/Tailwind.Traders.Web.zip  # Specify the folder or file to deploy
           publish-profile: ${{ secrets.PUBLISH_PROFILE }}  # Replace with the name of your publish profile
