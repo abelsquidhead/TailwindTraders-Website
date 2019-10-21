@@ -18,7 +18,7 @@ jobs:
       
     # restore packages from nuget
     - name: Restore packages with nuget
-      uses: nuget restore ./Source/Tailwind.Traders.Web.sln
+      uses: nuget restore .\Source\Tailwind.Traders.Web.sln
     
     # setup msbuild and put it in the path
     - name: Setup MSBuild.exe
