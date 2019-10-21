@@ -28,18 +28,10 @@ jobs:
     # create staging directory
     - name: Create staging directory
       run: mkdir staging
-      
-    # build solution
-    - name: build solution
-      run: msbuild ./Source/Tailwind.Traders.Web.sln /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="%GITHUB_WORKSPACE%\staging"'
-      
-    # find output
-    - name: find output
-      run: ls
-      
-    - name: find output 2
-      run: |
-       cd staging
-       ls
-  
-  
+    
+    # upload build artifact
+    - name: publish build artifacts back to GitHub
+      uses: actions/upload-artifact@master
+      with:
+        name: webapp
+        path: staging
