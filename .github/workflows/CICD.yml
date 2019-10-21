@@ -11,6 +11,14 @@ jobs:
     # checkout code from repo
     - name: Checkout code
       uses: actions/checkout@v1
+      
+    # setup nuget
+    - name: Setup nuget
+      uses: warrenbuckley/Setup-Nuget@v1
+      
+    # restore packages from nuget
+    - name: Restore packages with nuget
+      uses: nuget restore ./Source/Tailwind.Traders.Web.sln
     
     # setup msbuild and put it in the path
     - name: Setup MSBuild.exe
