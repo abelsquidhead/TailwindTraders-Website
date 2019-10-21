@@ -24,11 +24,11 @@ jobs:
       uses: warrenbuckley/Setup-MSBuild@v1
       
     # build solution
-    - name: build solution
+    - name: Build solution
       run: msbuild ./Source/Tailwind.Traders.Web.sln /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="%GITHUB_WORKSPACE%\staging"
         
     # find zip file
-    - name: find zip
+    - name: Find zip
       run: |
         echo pwd
         pwd
@@ -42,7 +42,7 @@ jobs:
         pwd
     
     # upload build artifact
-    - name: publish build artifacts back to GitHub
+    - name: Publish build artifacts back to GitHub
       uses: actions/upload-artifact@master
       with:
         name: webapp
@@ -58,6 +58,20 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: webapp
+          
+      # find zip file
+      - name: Find zip
+        run: |
+          echo pwd
+          pwd
+          echo ls
+          ls
+          echo cd webapp
+          cd webapp
+          echo ls
+          ls
+          echo pwd
+          pwd
           
       # Deploy build artifact to Azure App Service
       - name: Publish website to Azure App Service
