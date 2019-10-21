@@ -8,6 +8,10 @@ jobs:
     runs-on: windows-latest
     
     steps:
+    
+    # test github workspace
+    - name: See if i can echo github workspace
+      run: echo hello world ${{ github.GITHUB_WORKSPACE }}
     # checkout code from repo
     - name: Checkout code
       uses: actions/checkout@v1
