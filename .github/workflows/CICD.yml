@@ -1,0 +1,36 @@
+name: ASP.NET Core CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+    
+    steps:
+    # checkout code from repo
+    - name: Checkout code
+      uses: actions/checkout@v1
+    
+    # setup msbuild and put it in the path
+    - name: Setup MSBuild.exe
+      uses: warrenbuckley/Setup-MSBuild@v1
+      
+    # create staging directory
+    - name: Create staging directory
+      run: mkdir staging
+      
+    # build solution
+    - name: build solution
+      run: msbuild ./Source/Tailwind.Traders.Web.sln /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="staging"'
+      
+    # find output
+    - name: find output
+      run: ls
+      
+    - name: find output 2
+      run: |
+       cd staging
+       ls
+  
+  
