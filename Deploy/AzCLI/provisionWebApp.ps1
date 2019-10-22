@@ -151,4 +151,4 @@ Write-Output ""
 #region Deploy Web App
 # Deploy Web App
 #
-az webapp deployment source config-zip -g $resourceGroupName -n $webAppName --src .\Deploy\Tailwind.Traders.Web.zip
+az webapp deployment source config-zip -g $resourceGroupName -n $webAppName --src .\Deploy\webapp.zip
