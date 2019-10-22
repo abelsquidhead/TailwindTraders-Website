@@ -147,3 +147,8 @@ Write-Output ""
 # Write-Output "done setting and configuring application insight for web app"
 # Write-Output ""
 #endregion
+
+#region Deploy Web App
+# Deploy Web App
+#
+az webapp deploymnet source config-zip -g $resourceGroupName -n $webAppName --src .\Deploy\Tailwind.Traders.Web.zip
