@@ -4,33 +4,79 @@ on: [push]
 
 jobs:
   build:
-
     runs-on: windows-latest
-    
     steps:
+    
     # checkout code from repo
     - name: Checkout code
       uses: actions/checkout@v1
+      
+    # setup nuget
+    - name: Setup nuget
+      uses: warrenbuckley/Setup-Nuget@v1
+      
+    # restore packages from nuget
+    - name: Restore packages with nuget
+      run: nuget restore ./Source/Tailwind.Traders.Web.sln
     
     # setup msbuild and put it in the path
     - name: Setup MSBuild.exe
       uses: warrenbuckley/Setup-MSBuild@v1
       
-    # create staging directory
-    - name: Create staging directory
-      run: mkdir staging
-      
     # build solution
-    - name: build solution
-      run: msbuild ./Source/Tailwind.Traders.Web.sln /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="staging"'
-      
-    # find output
-    - name: find output
-      run: ls
-      
-    - name: find output 2
+    - name: Build solution
+      run: msbuild ./Source/Tailwind.Traders.Web.sln /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="%GITHUB_WORKSPACE%\staging"
+        
+    # find zip file
+    - name: Find zip
       run: |
-       cd staging
-       ls
-  
-  
+        echo pwd
+        pwd
+        echo ls
+        ls
+        echo cd staging
+        cd staging
+        echo ls
+        ls
+        echo pwd
+        pwd
+    
+    # upload build artifact
+    - name: Publish build artifacts back to GitHub
+      uses: actions/upload-artifact@master
+      with:
+        name: webapp
+        path: staging
+
+  provisionAndDeploy:
+    needs: [build] 
+    runs-on: windows-latest
+    steps:
+      
+      # download build artifacts
+      - name: Download build artifacts
+        uses: actions/download-artifact@master
+        with:
+          name: webapp
+          
+      # find zip file
+      - name: Find zip
+        run: |
+          echo pwd
+          pwd
+          echo ls
+          ls
+          echo cd webapp
+          cd webapp
+          echo ls
+          ls
+          echo pwd
+          pwd
+          
+      # Deploy build artifact to Azure App Service
+      - name: Publish website to Azure App Service
+        uses: azure/appservice-actions/webapp@master
+        with:
+          app-name: abeltailwindstaging  # Replace with your app name
+          package: webapp/Tailwind.Traders.Web.zip  # Specify the folder or file to deploy
+          publish-profile: ${{ secrets.PUBLISH_PROFILE }}  # Replace with the name of your publish profile
