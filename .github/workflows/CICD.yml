@@ -25,7 +25,7 @@ jobs:
       
     # build solution
     - name: Build solution
-      run: msbuild ./Source/Tailwind.Traders.Web.sln /nologo /nr:false /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=false /p:SkipInvalidConfigurations=true /p:platform="Any CPU" /p:configuration="Release" /p:VisualStudioVersion="16.0" /p:PackageLocation="%GITHUB_WORKSPACE%\staging"
+      run: msbuild ./Source/Tailwind.Traders.Web.sln /nologo /nr:false /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:SkipInvalidConfigurations=true /p:platform="Any CPU" /p:configuration="Release" /p:VisualStudioVersion="16.0" /p:outdir="%GITHUB_WORKSPACE%\staging"
         
     # find zip file
     - name: Find zip
@@ -80,3 +80,11 @@ jobs:
           app-name: abeltailwindstaging  # Replace with your app name
           package: webapp/Tailwind.Traders.Web.zip  # Specify the folder or file to deploy
           publish-profile: ${{ secrets.PUBLISH_PROFILE }}  # Replace with the name of your publish profile
+          
+      # Deploy build artifact to Azure App Service
+      #- name: Publish website to Azure App Service
+      #  uses: azure/appservice-actions/webapp@master
+      #  with:
+      #    app-name: abelmercurywebcore  # Replace with your app name
+      #    package: webapp  # Specify the folder or file to deploy
+      #    publish-profile: ${{ secrets.PUBLISH_PROFILE }}  # Replace with the name of your publish profile
