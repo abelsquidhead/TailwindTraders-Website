@@ -29,7 +29,7 @@ jobs:
     
     # copy zip to stabing
     - name: Build solution
-      run: copy .\Deploy\Tailwind.Traders.Web.zip .\staging
+      run: copy .\Deploy\Tailwind.Traders.Web.zip .\staging\Tailwind.Traders.Web.zip
     
     # find zip file
     - name: Find zip
