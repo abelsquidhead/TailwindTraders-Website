@@ -55,7 +55,7 @@ jobs:
 
       - name: Provision infrastructure
         env:
-          SERVICE_PRINCIPAL: http://AbelDeployPrincipal
+          SERVICE_PRINCIPAL: http://AbelDeployDemoPrincipal
           SERVICE_PRINCIPAL_TENANT: 72f988bf-86f1-41af-91ab-2d7cd011db47
           RESOURCE_GROUP: tailwindtraders-web-ignite-rg
           RESOURCE_GROUP_REGION: southcentralus
