@@ -307,7 +307,7 @@ else {
     $newDnsEntry = @{
         type='CNAME'
         name='@'
-        content="$frontDoorFQDN"
+        content="$FQDN"
         proxied=$true
         priority=10
     }
