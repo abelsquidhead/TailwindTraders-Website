@@ -57,7 +57,7 @@ jobs:
         env:
           SERVICE_PRINCIPAL: http://AbelDeployDemoPrincipal
           SERVICE_PRINCIPAL_TENANT: 72f988bf-86f1-41af-91ab-2d7cd011db47
-          RESOURCE_GROUP: tailwindtraders-web-ignite-rg
+          RESOURCE_GROUP: TailwindTraders-Web-Ignite-RG
           RESOURCE_GROUP_REGION: southcentralus
           WEB_APP_NAME: abeltailwindtraders
           APP_SERVICE_REGION: southcentralus
@@ -81,6 +81,6 @@ jobs:
       - name: Publish website to Azure App Service
         uses: azure/webapps-deploy@v1
         with:
-          app-name: abeltailwindstaging  # Replace with your app name
+          app-name: abeltailwindtraders  # Replace with your app name
           package: staging/Content/d_C/a/1/s/Source/Tailwind.Traders.Web/obj/Release/netcoreapp2.1/PubTmp/Out  # Specify the folder or file to deploy
           publish-profile: ${{ secrets.PUBLISH_PROFILE }}  # Replace with the name of your publish profile
