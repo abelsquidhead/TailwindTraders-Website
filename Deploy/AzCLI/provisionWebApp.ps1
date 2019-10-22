@@ -56,7 +56,11 @@ param(
 
     [Parameter(Mandatory = $True)]  
     [string]
-    $cloudFlareEmail
+    $cloudFlareEmail,
+
+    [Parameter(Mandatory = $True)]  
+    [string]
+    $nakedDns
 )
 
 

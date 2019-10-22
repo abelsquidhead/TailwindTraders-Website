@@ -68,6 +68,7 @@ jobs:
           CLOUDFLARE_ID: 15cc0ef41e07ee95b5e3ff18ca72c770
           DNS_NAME: www.abeltailwindtraders.com
           CLOUDFLARE_EMAIL: abel.wang@gmail.com
+          NAKED_DNS: abeltailwindtraders.com
         run: >
           powershell -command "& ./Deploy/AzCLI/provisionWebApp.ps1 "
           -servicePrincipal %SERVICE_PRINCIPAL% 
@@ -84,6 +85,7 @@ jobs:
           -dnsName %DNS_NAME% 
           -cloudFlareKey ${{ secrets.CLOUDFLARE_API_KEY }} 
           -cloudFlareEmail %CLOUDFLARE_EMAIL%
+          -nakedDns %NAKED_DNS%
 
                     
       # # Deploy build artifact to Azure App Service
