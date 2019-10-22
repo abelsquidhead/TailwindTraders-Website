@@ -16,8 +16,8 @@ jobs:
       uses: warrenbuckley/Setup-Nuget@v1
       
     # restore packages from nuget
-    - name: Restore packages with nuget
-      run: nuget restore ./Source/Tailwind.Traders.Web.sln
+    #- name: Restore packages with nuget
+    #  run: nuget restore ./Source/Tailwind.Traders.Web.sln
     
     # setup msbuild and put it in the path
     - name: Setup MSBuild.exe
@@ -38,8 +38,8 @@ jobs:
         pwd
         echo ls
         ls
-        echo cd Deploy
-        cd Deploy
+        echo cd staging
+        cd staging
         echo pwd
         pwd
         echo ls
@@ -50,7 +50,7 @@ jobs:
       uses: actions/upload-artifact@master
       with:
         name: webapp
-        path: Deploy
+        path: staging
 
   provisionAndDeploy:
     needs: [build] 
@@ -63,6 +63,10 @@ jobs:
         with:
           name: webapp
           
+      # checkout code from repo
+      - name: Checkout code
+        uses: actions/checkout@v1          
+      
       # find zip file
       - name: Find zip
         run: |
@@ -78,17 +82,17 @@ jobs:
           ls
                     
       # Deploy build artifact to Azure App Service
-      #- name: Publish website to Azure App Service
-      #  uses: azure/webapps-deploy@v1
-      #  with:
-      #    app-name: abeltailwindstaging  # Replace with your app name
-      #    package: webapp  # Specify the folder or file to deploy
-      #    publish-profile: ${{ secrets.PUBLISH_PROFILE }}  # Replace with the name of your publish profile
-          
-      # Deploy build artifact to Azure App Service
       - name: Publish website to Azure App Service
-        uses: azure/appservice-actions/webapp@master
+        uses: azure/webapps-deploy@v1
         with:
           app-name: abeltailwindstaging  # Replace with your app name
-          package: webapp\Tailwind.Traders.Web.zip  # Specify the folder or file to deploy
+          package: staging  # Specify the folder or file to deploy
           publish-profile: ${{ secrets.PUBLISH_PROFILE }}  # Replace with the name of your publish profile
+         
+      # Deploy build artifact to Azure App Service
+      #- name: Publish website to Azure App Service
+      #  uses: azure/appservice-actions/webapp@master
+      #  with:
+      #    app-name: abeltailwindstaging  # Replace with your app name
+      #    package: webapp\Tailwind.Traders.Web.zip  # Specify the folder or file to deploy
+      #  publish-profile: ${{ secrets.PUBLISH_PROFILE }}  # Replace with the name of your publish profile
