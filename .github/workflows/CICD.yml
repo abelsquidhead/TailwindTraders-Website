@@ -72,10 +72,16 @@ jobs:
           ls
           echo cd webapp
           cd webapp
-          echo ls
-          ls
           echo pwd
           pwd
+          echo ls
+          ls
+          echo cd staging
+          cd staging
+          echo pwd
+          pwd
+          echo ls
+          ls
           
       # Deploy build artifact to Azure App Service
       #- name: Publish website to Azure App Service
