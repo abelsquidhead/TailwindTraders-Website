@@ -64,6 +64,10 @@ jobs:
           APP_SERVICE_SKU: P3V2 
           API_URL: https://backend.tailwindtraders.com/webbff/v1
           API_URL_SHOPPING_CART: https://backend.tailwindtraders.com/cart-api
+          CLOUDFLARE_ZONE: d1132c2a5c07edec69da294bd17adb33
+          CLOUDFLARE_ID: 15cc0ef41e07ee95b5e3ff18ca72c770
+          DNS_NAME: www.abeltailwindtraders.com
+          CLOUDFLARE_EMAIL: abel.wang@gmail.com
         run: >
           powershell -command "& ./Deploy/AzCLI/provisionWebApp.ps1 "
           -servicePrincipal %SERVICE_PRINCIPAL% 
@@ -76,6 +80,11 @@ jobs:
           -appServiceSKU %APP_SERVICE_SKU%
           -apiUrl %API_URL% 
           -apiUrlShoppingCart %API_URL_SHOPPING_CART% 
+          -cloudFlareZone %CLOUDFLARE_ZONE% 
+          -dnsName %DNS_NAME% 
+          -cloudFlareKey ${{ secrets.CLOUDFLARE_API_KEY }} 
+          -cloudFlareEmail %CLOUDFLARE_EMAIL%
+
                     
       # # Deploy build artifact to Azure App Service
       # - name: Publish website to Azure App Service

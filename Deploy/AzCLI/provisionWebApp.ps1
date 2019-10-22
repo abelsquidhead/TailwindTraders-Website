@@ -40,7 +40,23 @@ param(
 
     [Parameter(Mandatory = $True)]  
     [string]
-    $apiUrlShoppingCart
+    $apiUrlShoppingCart,
+
+    [Parameter(Mandatory = $True)]  
+    [string]
+    $cloudFlareZone,
+
+    [Parameter(Mandatory = $True)]  
+    [string]
+    $dnsName,
+
+    [Parameter(Mandatory = $True)]  
+    [string]
+    $cloudFlareKey,
+
+    [Parameter(Mandatory = $True)]  
+    [string]
+    $cloudFlareEmail
 )
 
 
@@ -121,34 +137,198 @@ $appInsightCreateResponse=$(az resource create `
     --properties '{\"Application_Type\":\"web\"}') | ConvertFrom-Json
 Write-Output "done creating app insight for node 1: $appInsightCreateResponse"
 Write-Output ""
+#endregion
 
-# # this gets the instrumentation key from the create response
-# #
-# Write-Output "getting instrumentation key from the create response..."
-# $instrumentationKey = $appInsightCreateResponse.properties.InstrumentationKey
-# Write-Output "done getting instrumentation key"
-# Write-Output ""
+#region get all dns records from cloudflare
+# this lists all dns records from cloudflare
+#
+Write-Output "getting all dns records from cloudflare..."
+$headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+$headers.Add("X-Auth-Key", $cloudFlareKey)
+$headers.Add("X-Auth-Email", $cloudFlareEmail)
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls -bor [Net.SecurityProtocolType]::Tls11 -bor [Net.SecurityProtocolType]::Tls12
+$listDnsResult=Invoke-RestMethod "https://api.cloudflare.com/client/v4/zones/$cloudFlareZone/dns_records" `
+    -Headers $headers
+Write-Output $listDnsResult
+Write-Output "done getting all dns records"
+$numEntries=$listDnsResult.result_info.count
+Write-Output "number of dns entries: $numEntries" 
+Write-Output ""
+#endregion
 
-# # this sets application insight to web app
-# #
-# Write-Output "setting and configuring application insight for webapp..."
-# az webapp config appsettings set `
-#     --resource-group $resourceGroupName `
-#     --name $webAppName `
-#     --slot-settings APPINSIGHTS_INSTRUMENTATIONKEY=$instrumentationKey `
-#                     ApplicationInsightsAgent_EXTENSION_VERSION=~2 `
-#                     XDT_MicrosoftApplicationInsights_Mode=recommended `
-#                     APPINSIGHTS_PROFILERFEATURE_VERSION=1.0.0 `
-#                     DiagnosticServices_EXTENSION_VERSION=~3 `
-#                     APPINSIGHTS_SNAPSHOTFEATURE_VERSION=1.0.0 `
-#                     SnapshotDebugger_EXTENSION_VERSION=~1 `
-#                     InstrumentationEngine_EXTENSION_VERSION=~1 `
-#                     XDT_MicrosoftApplicationInsights_BaseExtension=~1
-# Write-Output "done setting and configuring application insight for web app"
-# Write-Output ""
+#region look at all dns records, see if the our dns name has already 
+# been set. This block looks for our dns name, see if it has been set or not
+#
+Write-Output "looking for correct DNS entry"
+$foundDnsEntry = $false
+$foundDnsEntryId = "x"
+$listDnsResult.result | ForEach-Object {
+    $dnsEntryName = $_.name
+    Write-Output "dns entry name: $dnsEntryName"
+    if ($dnsEntryName -eq $dnsName) {
+        Write-Output "found correct dns entry"
+        $foundDnsEntry =$true
+        $foundDnsEntryId = $_.id
+        return
+    }
+}
+Write-Output "found dns entry: $foundDnsEntry"
+Write-Output "dns entry id: $foundDnsEntryId"
+Write-Output ""
+#endregion
+
+#region updates/adds dns entry to cloudflare
+# this either updates or adds a new dns entry to cloudflare
+#
+$FQDN=$webAppName + ".azurewebsites.net"
+Write-Output "fqdn: $FQDN"
+if ($foundDnsEntry -eq $true) {
+    Write-Output "updating dns entry..."
+    $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+    $headers.Add("X-Auth-Key", $cloudFlareKey)
+    $headers.Add("X-Auth-Email", $cloudFlareEmail)
+    $updateDnsEntry = @{
+        type='CNAME'
+        name='www'
+        content="$FQDN"
+        proxied=$false
+    }
+    $json = $updateDnsEntry | ConvertTo-Json
+    $updateDnsResponse = $(Invoke-RestMethod "https://api.cloudflare.com/client/v4/zones/$cloudFlareZone/dns_records/$foundDnsEntryId" `
+        -Headers $headers `
+        -Method Put `
+        -Body $json `
+        -ContentType 'application/json')
+
+    Write-Output "done updating dns"
+    Write-Output "cloudflare response: "
+    Write-Output $updateDnsResponse
+    Write-Output ""
+}
+else {
+    Write-Output "adding new dns entry..."
+    $newDnsResponse = $()
+    $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+    $headers.Add("X-Auth-Key", $cloudFlareKey)
+    $headers.Add("X-Auth-Email", $cloudFlareEmail)
+    $newDnsEntry = @{
+        type='CNAME'
+        name='www'
+        content="$FQDN"
+        proxied=$false
+        priority=10
+    }
+    $json = $newDnsEntry | ConvertTo-Json
+    $newDnsResponse = $(Invoke-RestMethod "https://api.cloudflare.com/client/v4/zones/$cloudFlareZone/dns_records" `
+    -Headers $headers `
+    -Method Post `
+    -Body $json `
+    -ContentType 'application/json')
+
+    Write-Output "done adding dns"
+    Write-Output "cloudflare response: "
+    Write-Output $newDnsResponse
+    Write-Output ""
+}
+#endregion
+
+
+#region gets all dns entries from cloudflare for apex domain
+# this lists all dns records from cloudflare for apex domain
+#
+Write-Output "getting all dns records from cloudflare..."
+$headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+$headers.Add("X-Auth-Key", $cloudFlareKey)
+$headers.Add("X-Auth-Email", $cloudFlareEmail)
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls -bor [Net.SecurityProtocolType]::Tls11 -bor [Net.SecurityProtocolType]::Tls12
+$listDnsResult=Invoke-RestMethod "https://api.cloudflare.com/client/v4/zones/$cloudFlareZone/dns_records" `
+    -Headers $headers
+Write-Output $listDnsResult
+Write-Output "done getting all dns records"
+$numEntries=$listDnsResult.result_info.count
+Write-Output "number of dns entries: $numEntries" 
+Write-Output ""
+#endregion
+
+#region look at all dns records, see if our dns name has already been set
+# this looks for our dns name, see if it has been set or not
+#
+$foundDnsEntry = $false
+$foundDnsEntryId = "x"
+$listDnsResult.result | ForEach-Object {
+    $dnsEntryName = $_.name
+    if ($dnsEntryName -eq $nakedDns) {
+        $foundDnsEntry =$true
+        $foundDnsEntryId = $_.id
+        return
+    }
+}
+Write-Output "found dns entry: $foundDnsEntry"
+Write-Output "dns entry id: $foundDnsEntryId"
+Write-Output ""
+#endregion
+
+#region update/add  dns entry to cloudflare for apex domain
+# this either updates or adds a new dns entry to cloudflare for
+# the apex domain
+#
+$FQDN=$webAppName + ".azurewebsites.net"
+if ($foundDnsEntry -eq $true) {
+    Write-Output "updating dns entry..."
+    $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+    $headers.Add("X-Auth-Key", $cloudFlareKey)
+    $headers.Add("X-Auth-Email", $cloudFlareEmail)
+    $updateDnsEntry = @{
+        type='CNAME'
+        name='@'
+        content="$FQDN"
+        proxied=$true
+    }
+    $json = $updateDnsEntry | ConvertTo-Json
+    $updateDnsResponse = $(Invoke-RestMethod "https://api.cloudflare.com/client/v4/zones/$cloudFlareZone/dns_records/$foundDnsEntryId" `
+        -Headers $headers `
+        -Method Put `
+        -Body $json `
+        -ContentType 'application/json')
+
+    Write-Output "done updating dns"
+    Write-Output "cloudflare response: "
+    Write-Output $updateDnsResponse
+    Write-Output ""
+
+    Write-Output "done updating dns"
+    Write-Output ""
+}
+else {
+    Write-Output "adding new dns entry..."
+    $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+    $headers.Add("X-Auth-Key", $cloudFlareKey)
+    $headers.Add("X-Auth-Email", $cloudFlareEmail)
+    $newDnsEntry = @{
+        type='CNAME'
+        name='@'
+        content="$frontDoorFQDN"
+        proxied=$true
+        priority=10
+    }
+    $json = $newDnsEntry | ConvertTo-Json
+    $newDnsResponse = $(Invoke-RestMethod "https://api.cloudflare.com/client/v4/zones/$cloudFlareZone/dns_records" `
+    -Headers $headers `
+    -Method Post `
+    -Body $json `
+    -ContentType 'application/json')
+
+    Write-Output "done adding dns"
+    Write-Output "cloudflare response: "
+    Write-Output $newDnsResponse
+    Write-Output ""
+    Write-Output "done adding new dns entry"
+    Write-Output ""
+}
 #endregion
 
 #region Deploy Web App
 # Deploy Web App
 #
 az webapp deployment source config-zip -g $resourceGroupName -n $webAppName --src .\Deploy\webapp.zip
+#endregion
