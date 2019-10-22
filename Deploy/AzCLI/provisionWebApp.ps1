@@ -327,6 +327,65 @@ else {
 }
 #endregion
 
+#region check page rules
+# this looks to see if we need to add a page rule for apex domain
+# first by looking up all the rules
+#
+Write-Output "getting all rules from cloudflare..."
+$headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+$headers.Add("X-Auth-Key", $cloudFlareKey)
+$headers.Add("X-Auth-Email", $cloudFlareEmail)
+$headers.Add("Content-Type", "application/json")
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls -bor [Net.SecurityProtocolType]::Tls11 -bor [Net.SecurityProtocolType]::Tls12
+$listRulesResult=Invoke-RestMethod "https://api.cloudflare.com/client/v4/zones/$cloudFlareZone/pagerules?status=active&order=status&direction=desc&match=all" `
+    -Headers $headers
+Write-Output $listRulesResult
+Write-Output "done getting all dns records"
+$numEntries=$listRulesResult.result_info.count
+Write-Output "number of dns entries: $numEntries" 
+Write-Output ""
+#endregion
+
+#region delete old page rules
+# delete these old rule entries
+#
+Write-Output "deleting all rule entries..."
+$listRulesResult.result | ForEach-Object {
+    $ruleId = $_.id
+    Write-Output "deleting rule with id: $ruleId"
+    $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+    $headers.Add("X-Auth-Key", $cloudFlareKey)
+    $headers.Add("X-Auth-Email", $cloudFlareEmail)
+    $deleteResult = Invoke-RestMethod "https://api.cloudflare.com/client/v4/zones/$cloudFlareZone/pagerules/$ruleId" `
+        -Headers $headers `
+        -Method Delete
+    Write-Output "delete response: "
+    Write-Output $deleteResult
+}
+Write-Output "done deleting all rule entries"    
+Write-Output ""
+#endregion
+
+#region add new apex domain rules
+# Add in the apex domain rule
+#
+Write-Output "adding apex domain rule..."
+$json = '{"targets":[{"target":"url", "constraint":{"operator":"matches","value":"' + $nakedDns + '/*"}}],"actions":[{"id":"forwarding_url","value": {"url": "https://' + $dnsName + '/$1","status_code": 301}}],"priority":1,"status":"active"}'
+Write-Output "body: $json"
+$headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+$headers.Add("X-Auth-Key", $cloudFlareKey)
+$headers.Add("X-Auth-Email", $cloudFlareEmail)
+$headers.Add("Content-Type", "application/json")
+$addRuleResponse = Invoke-RestMethod "https://api.cloudflare.com/client/v4/zones/$cloudFlareZone/pagerules" `
+    -Headers $headers `
+    -Method Post `
+    -Body $json `
+    -ContentType 'application/json'
+Write-Output $addRuleResponse
+Write-Output "done adding apex domain rule"
+Write-Output ""
+#endregion
+
 #region Deploy Web App
 # Deploy Web App
 #
