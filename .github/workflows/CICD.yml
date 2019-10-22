@@ -86,7 +86,7 @@ jobs:
         uses: azure/webapps-deploy@v1
         with:
           app-name: abeltailwindstaging  # Replace with your app name
-          package: staging  # Specify the folder or file to deploy
+          package: staging/Content/d_C/a/1/s/Source/Tailwind.Traders.Web/obj/Release/netcoreapp2.1/PubTmp/Out  # Specify the folder or file to deploy
           publish-profile: ${{ secrets.PUBLISH_PROFILE }}  # Replace with the name of your publish profile
          
       # Deploy build artifact to Azure App Service
