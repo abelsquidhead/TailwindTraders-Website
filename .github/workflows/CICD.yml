@@ -25,7 +25,7 @@ jobs:
       
     # build solution
     - name: Build solution
-      run: msbuild ./Source/Tailwind.Traders.Web.sln /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="%GITHUB_WORKSPACE%\staging"
+      run: msbuild ./Source/Tailwind.Traders.Web.sln /nologo /nr:false /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=false /p:SkipInvalidConfigurations=true /p:platform="Any CPU" /p:configuration="Release" /p:VisualStudioVersion="16.0" /p:PackageLocation="%GITHUB_WORKSPACE%\staging"
         
     # find zip file
     - name: Find zip
