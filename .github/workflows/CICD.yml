@@ -16,8 +16,8 @@ jobs:
       uses: warrenbuckley/Setup-Nuget@v1
       
     # restore packages from nuget
-    - name: Restore packages with nuget
-      run: nuget restore ./Source/Tailwind.Traders.Web.sln
+    #- name: Restore packages with nuget
+    #  run: nuget restore ./Source/Tailwind.Traders.Web.sln
     
     # setup msbuild and put it in the path
     - name: Setup MSBuild.exe
