@@ -72,8 +72,8 @@ jobs:
           -resourceGroupName %RESOURCE_GROUP% 
           -resourceGroupNameRegion %RESOURCE_GROUP_REGION% 
           -webAppName %WEB_APP_NAME% 
-          -appServiceRegion %APP_SERVICE_REGION% 
-          -appServiceSKU %APP_SERVICE_SKU% 
+          -appServiceRegion %APP_SERVICE_REGION%
+          -appServiceSKU %APP_SERVICE_SKU%
           -apiUrl %API_URL% 
           -apiUrlShoppingCart %API_URL_SHOPPING_CART% 
                     
