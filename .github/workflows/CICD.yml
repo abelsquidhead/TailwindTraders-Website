@@ -38,18 +38,18 @@ jobs:
         pwd
         echo ls
         ls
-        echo cd staging
-        cd staging
-        echo ls
-        ls
+        echo cd Deploy
+        cd Deploy
         echo pwd
         pwd
+        echo ls
+        ls
     
     # upload build artifact
     - name: Publish build artifacts back to GitHub
       uses: actions/upload-artifact@master
       with:
-        name: webapp
+        name: Deploy
         path: staging
 
   provisionAndDeploy:
@@ -76,13 +76,7 @@ jobs:
           pwd
           echo ls
           ls
-          echo cd staging
-          cd staging
-          echo pwd
-          pwd
-          echo ls
-          ls
-          
+                    
       # Deploy build artifact to Azure App Service
       #- name: Publish website to Azure App Service
       #  uses: azure/webapps-deploy@v1
