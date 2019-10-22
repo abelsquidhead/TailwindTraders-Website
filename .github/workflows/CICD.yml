@@ -49,8 +49,8 @@ jobs:
     - name: Publish build artifacts back to GitHub
       uses: actions/upload-artifact@master
       with:
-        name: Deploy
-        path: staging
+        name: webapp
+        path: Deploy
 
   provisionAndDeploy:
     needs: [build] 
