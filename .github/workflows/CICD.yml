@@ -31,20 +31,6 @@ jobs:
     - name: Build solution
       run: copy .\Deploy\Tailwind.Traders.Web.zip .\Tailwind.Traders.Web.zip
     
-    # find zip file
-    - name: Find zip
-      run: |
-        echo pwd
-        pwd
-        echo ls
-        ls
-        echo cd staging
-        cd staging
-        echo pwd
-        pwd
-        echo ls
-        ls
-    
     # upload build artifact
     - name: Publish build artifacts back to GitHub
       uses: actions/upload-artifact@master
@@ -66,20 +52,30 @@ jobs:
       # checkout code from repo
       - name: Checkout code
         uses: actions/checkout@v1          
-      
-      # find zip file
-      - name: Find zip
-        run: |
-          echo pwd
-          pwd
-          echo ls
-          ls
-          echo cd webapp
-          cd webapp
-          echo pwd
-          pwd
-          echo ls
-          ls
+
+      - name: Provision infrastructure
+        env:
+          SERVICE_PRINCIPAL: http://AbelDeployPrincipal
+          SERVICE_PRINCIPAL_TENANT: 72f988bf-86f1-41af-91ab-2d7cd011db47
+          RESOURCE_GROUP: tailwindtraders-web-ignite-rg
+          RESOURCE_GROUP_REGION: southcentralus
+          WEB_APP_NAME: abeltailwindtraders
+          APP_SERVICE_REGION: southcentralus
+          APP_SERVICE_SKU: P3V2 
+          API_URL: https://backend.tailwindtraders.com/webbff/v1
+          API_URL_SHOPPING_CART: https://backend.tailwindtraders.com/cart-api
+        run: >
+          powershell -command "& ./Deploy/AzCLI/provisionWebApp.ps1 "
+          -servicePrincipal %SERVICE_PRINCIPAL% 
+          -servicePrincipalSecret ${{ secrets.SERVICE_PRINCIPAL_SECRET }} 
+          -servicePrincipalTenantId %SERVICE_PRINCIPAL_TENANT% 
+          -resourceGroupName %RESOURCE_GROUP% 
+          -resourceGroupNameRegion %RESOURCE_GROUP_REGION% 
+          -webAppName %WEB_APP_NAME% 
+          -appServiceRegion %APP_SERVICE_REGION% 
+          -appServiceSKU %APP_SERVICE_SKU% 
+          -apiUrl %API_URL% 
+          -apiUrlShoppingCart %API_URL_SHOPPING_CART% 
                     
       # Deploy build artifact to Azure App Service
       - name: Publish website to Azure App Service
@@ -88,11 +84,4 @@ jobs:
           app-name: abeltailwindstaging  # Replace with your app name
           package: staging/Content/d_C/a/1/s/Source/Tailwind.Traders.Web/obj/Release/netcoreapp2.1/PubTmp/Out  # Specify the folder or file to deploy
           publish-profile: ${{ secrets.PUBLISH_PROFILE }}  # Replace with the name of your publish profile
-         
-      # Deploy build artifact to Azure App Service
-      #- name: Publish website to Azure App Service
-      #  uses: azure/appservice-actions/webapp@master
-      #  with:
-      #    app-name: abeltailwindstaging  # Replace with your app name
-      #    package: webapp\Tailwind.Traders.Web.zip  # Specify the folder or file to deploy
-      #  publish-profile: ${{ secrets.PUBLISH_PROFILE }}  # Replace with the name of your publish profile
+
