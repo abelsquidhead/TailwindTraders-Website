@@ -129,7 +129,7 @@ jobs:
           SERVICE_PRINCIPAL: http://AbelDeployDemoPrincipal
           SERVICE_PRINCIPAL_TENANT: 72f988bf-86f1-41af-91ab-2d7cd011db47
           RESOURCE_GROUP: TailwindTraders-Web-Ignite-RG
-          WEB_APP_NAME: abeltailwindtraders
+          WEB_APP: abeltailwindtraders
           PATH_TO_WEBSITE_ZIP: .\webapp\Tailwind.Traders.web.zip
           WEB_APP_NAME: abeltailwindtraders
         run: >
@@ -138,5 +138,5 @@ jobs:
           -servicePrincipalSecret ${{ secrets.SERVICE_PRINCIPAL_SECRET }}
           -servicePrincipalTenant %SERVICE_PRINCIPAL_TENANT
           -resourceGroupName %RESOURCE_GROUP%
-          -webAppName %WEB_APP_NAME%
+          -webAppName %WEB_APP%
           -pathToWebsiteZip %PATH_TO_WEBSITE_ZIP%
