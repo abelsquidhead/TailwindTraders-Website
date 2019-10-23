@@ -50,7 +50,8 @@ jobs:
         name: webapp
         path: staging
 
-  provisionAndConfigure:
+  provisionAndDeploy:
+    needs: build
     runs-on: windows-latest
     steps:
       # download build artifacts
@@ -70,6 +71,7 @@ jobs:
 
       # provision and configure infrastructure using a powershel script with Azure CLI
       - name: Provision infrastructure
+
         env:
           SERVICE_PRINCIPAL: http://AbelDeployDemoPrincipal
           SERVICE_PRINCIPAL_TENANT: 72f988bf-86f1-41af-91ab-2d7cd011db47
@@ -104,26 +106,7 @@ jobs:
           -cloudFlareEmail %CLOUDFLARE_EMAIL%
           -nakedDns %NAKED_DNS% 
 
-  deploy:
-    needs: [build, provisionAndConfigure] 
-    runs-on: windows-latest
-    steps:
-      
-      # download build artifacts
-      - name: Download build artifacts
-        uses: actions/download-artifact@master
-        with:
-          name: webapp
-
-      - name: show webapp directory
-        run: |
-          echo cd webapp
-          cd webapp
-          echo pwd
-          pwd
-          echo ls
-          ls
-          
+  
       # deploy web app
       - name: Deploy web app
         env:
