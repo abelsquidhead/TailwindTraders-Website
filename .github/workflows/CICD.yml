@@ -30,6 +30,7 @@ jobs:
     # copy zip to staging
     - name: Build solution
       run: |
+        mkdir staging
         copy .\Deploy\Tailwind.Traders.web.zip .\staging
         copy .\Deploy\AzCLI\provisionWebApp.ps1 .\staging
 
