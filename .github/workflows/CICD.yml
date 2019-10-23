@@ -32,6 +32,7 @@ jobs:
       run: |
         mkdir staging
         copy .\Deploy\Tailwind.Traders.web.zip .\staging
+        copy .\Deploy\ACLI\deployWebApp.ps1 .\staging
 
     - name: show staging
       run: |
