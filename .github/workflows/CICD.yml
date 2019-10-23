@@ -27,18 +27,26 @@ jobs:
     #- name: Build solution
     #  run: msbuild ./Source/Tailwind.Traders.Web.sln /nologo /nr:false /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:platform="Any CPU" /p:configuration="Release" /p:VisualStudioVersion="16.0" /p:PackageLocation="%GITHUB_WORKSPACE%\staging"
     
-    # copy zip to stabing
+    # copy zip to staging
     - name: Build solution
-      run: copy .\Deploy\Tailwind.Traders.Web.zip .\Tailwind.Traders.Web.zip
+      run: |
+        copy .\Deploy\webapp.zip .\staging
+        echo cd staging
+        cd staging
+        echo pwd
+        pwd
+        echo ls
+        ls
+
     
     # upload build artifact
     - name: Publish build artifacts back to GitHub
       uses: actions/upload-artifact@master
       with:
         name: webapp
-        path: staging
+        path: staging\webapp.zip
 
-  provisionAndDeploy:
+  provisionAndConfigure:
     needs: [build] 
     runs-on: windows-latest
     steps:
@@ -98,3 +106,18 @@ jobs:
       #     app-name: abeltailwindtraders  # Replace with your app name
       #     package: staging/Content/d_C/a/1/s/Source/Tailwind.Traders.Web/obj/Release/netcoreapp2.1/PubTmp/Out  # Specify the folder or file to deploy
       #     publish-profile: ${{ secrets.PUBLISH_PROFILE }}  # Replace with the name of your publish profile
+
+  deploy:
+    needs: [build, provisionAndConfigure] 
+    runs-on: windows-latest
+    steps:
+      
+      # download build artifacts
+      - name: Download build artifacts
+        uses: actions/download-artifact@master
+        with:
+          name: webapp
+          
+      # checkout code from repo
+      - name: Checkout code
+        uses: actions/checkout@v1       

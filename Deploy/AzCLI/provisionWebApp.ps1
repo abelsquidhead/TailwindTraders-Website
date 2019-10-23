@@ -390,15 +390,21 @@ Write-Output "done adding apex domain rule"
 Write-Output ""
 #endregion
 
-#getting certificate
-Write-Output "getting certificate..."
+#region getting certificate
+# Getting certificate from github secrets and decoding
+#
+Write-Output "getting certificate, decoding..."
 $pfx=$env:PFX
 $kvSecretBytes = [System.Convert]::FromBase64String($pfx)
 $certCollection = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2Collection
 $certCollection.Import($kvSecretBytes,$null,[System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable)
 Write-Output "done getting dev certificate"
 Write-Output ""
+#endregion
 
+#region saving pfx file to disk
+# Saving pfx file to disk
+#
 Write-Output "saving pfx to disk"
 $pfxPassword="abelpassword1"
 $password = $pfxPassword
@@ -407,7 +413,11 @@ $pfxPath = [Environment]::GetFolderPath("Desktop") + "\MyCert.pfx"
 [System.IO.File]::WriteAllBytes($pfxPath, $protectedCertificateBytes)
 Write-Output "done saving pfx to disk"
 Write-Output ""
+#endregion
 
+#region Uploading certificate
+# Uploading ssl certificate to webapp, getting thumbprint
+#
 Write-Output "uploading certificate, getting thumbprint"
 $thumbprint=$(az webapp config ssl upload `
 --name $webAppName `
@@ -418,9 +428,10 @@ $thumbprint=$(az webapp config ssl upload `
 --output tsv)
 Write-Output "done uploading certificate, thumbprint: $thumbprint"
 Write-Output ""
+#endregion
 
-
-Write-Output " adding custom domain and adding certificate "
+#region adding custom domain
+Write-Output "adding custom domain and adding certificate "
 az webapp config hostname add `
     --webapp-name $webAppName `
     --resource-group $resourceGroupName `
@@ -431,9 +442,8 @@ az webapp config ssl bind `
     --resource-group $resourceGroupName `
     --certificate-thumbprint $thumbprint `
     --ssl-type SNI
-
-
-
+Write-Output "done adding custom domain and adding certificate"
+#endregion
 
 #region Deploy Web App
 # Deploy Web App
