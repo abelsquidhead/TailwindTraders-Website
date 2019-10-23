@@ -400,7 +400,7 @@ Write-Output "done getting dev certificate"
 Write-Output ""
 
 Write-Output "saving pfx to disk"
-$pfxPassword=abelpassword1
+$pfxPassword="abelpassword1"
 $password = $pfxPassword
 $protectedCertificateBytes = $certCollection.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Pkcs12, $password)
 $pfxPath = [Environment]::GetFolderPath("Desktop") + "\MyCert.pfx"
