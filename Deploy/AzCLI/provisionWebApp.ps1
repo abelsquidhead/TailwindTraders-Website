@@ -444,9 +444,3 @@ az webapp config ssl bind `
     --ssl-type SNI
 Write-Output "done adding custom domain and adding certificate"
 #endregion
-
-#region Deploy Web App
-# Deploy Web App
-#
-az webapp deployment source config-zip -g $resourceGroupName -n $webAppName --src .\Deploy\webapp.zip
-#endregion

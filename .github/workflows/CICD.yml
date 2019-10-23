@@ -30,7 +30,11 @@ jobs:
     # copy zip to staging
     - name: Build solution
       run: |
-        copy .\Deploy\webapp.zip .\staging
+        copy .\Deploy\Tailwind.Traders.web.zip .\staging
+        copy .\Deploy\AzCLI\provisionWebApp.ps1 .\staging
+
+    - name: show staging
+      run: |
         echo cd staging
         cd staging
         echo pwd
@@ -38,29 +42,32 @@ jobs:
         echo ls
         ls
 
-    
     # upload build artifact
     - name: Publish build artifacts back to GitHub
       uses: actions/upload-artifact@master
       with:
         name: webapp
-        path: staging\webapp.zip
+        path: staging
 
   provisionAndConfigure:
-    needs: [build] 
     runs-on: windows-latest
     steps:
-      
       # download build artifacts
       - name: Download build artifacts
         uses: actions/download-artifact@master
         with:
           name: webapp
-          
-      # checkout code from repo
-      - name: Checkout code
-        uses: actions/checkout@v1          
+      
+      - name: show webapp directory
+        run: |
+          echo cd webapp
+          cd webapp
+          echo pwd
+          pwd
+          echo ls
+          ls
 
+      # provision and configure infrastructure using a powershel script with Azure CLI
       - name: Provision infrastructure
         env:
           SERVICE_PRINCIPAL: http://AbelDeployDemoPrincipal
@@ -95,17 +102,6 @@ jobs:
           -cloudFlareKey ${{ secrets.CLOUDFLARE_API_KEY }} 
           -cloudFlareEmail %CLOUDFLARE_EMAIL%
           -nakedDns %NAKED_DNS% 
-          
-          
-
-                    
-      # # Deploy build artifact to Azure App Service
-      # - name: Publish website to Azure App Service
-      #   uses: azure/webapps-deploy@v1
-      #   with:
-      #     app-name: abeltailwindtraders  # Replace with your app name
-      #     package: staging/Content/d_C/a/1/s/Source/Tailwind.Traders.Web/obj/Release/netcoreapp2.1/PubTmp/Out  # Specify the folder or file to deploy
-      #     publish-profile: ${{ secrets.PUBLISH_PROFILE }}  # Replace with the name of your publish profile
 
   deploy:
     needs: [build, provisionAndConfigure] 
@@ -117,7 +113,30 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: webapp
+
+      - name: show webapp directory
+        run: |
+          echo cd webapp
+          cd webapp
+          echo pwd
+          pwd
+          echo ls
+          ls
           
-      # checkout code from repo
-      - name: Checkout code
-        uses: actions/checkout@v1       
+      # deploy web app
+      - name: Deploy web app
+        env:
+          SERVICE_PRINCIPAL: http://AbelDeployDemoPrincipal
+          SERVICE_PRINCIPAL_TENANT: 72f988bf-86f1-41af-91ab-2d7cd011db47
+          RESOURCE_GROUP: TailwindTraders-Web-Ignite-RG
+          WEB_APP_NAME: abeltailwindtraders
+          PATH_TO_WEBSITE_ZIP: .\webapp\Tailwind.Traders.web.zip
+          WEB_APP_NAME: abeltailwindtraders
+        run: >
+          powershell -command "& ./webapp/deployWebApp.ps1 "
+          -servicePrincipal %SERVICE_PRINCIPAL% 
+          -servicePrincipalSecret ${{ secrets.SERVICE_PRINCIPAL_SECRET }}
+          -servicePrincipalTenant %SERVICE_PRINCIPAL_TENANT
+          -resourceGroupName %RESOURCE_GROUP%
+          -webAppName %WEB_APP_NAME%
+          -pathToWebsiteZip %PATH_TO_WEBSITE_ZIP%
