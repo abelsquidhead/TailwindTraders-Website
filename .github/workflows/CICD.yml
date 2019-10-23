@@ -69,6 +69,7 @@ jobs:
           DNS_NAME: www.abeltailwindtraders.com
           CLOUDFLARE_EMAIL: abel.wang@gmail.com
           NAKED_DNS: abeltailwindtraders.com
+          PFX: ${{ secrets.PFX }}
         run: >
           powershell -command "& ./Deploy/AzCLI/provisionWebApp.ps1 "
           -servicePrincipal %SERVICE_PRINCIPAL% 
@@ -86,7 +87,7 @@ jobs:
           -cloudFlareKey ${{ secrets.CLOUDFLARE_API_KEY }} 
           -cloudFlareEmail %CLOUDFLARE_EMAIL%
           -nakedDns %NAKED_DNS% 
-          -$pfx ${{ secrets.PFX }}
+          
           
 
                     

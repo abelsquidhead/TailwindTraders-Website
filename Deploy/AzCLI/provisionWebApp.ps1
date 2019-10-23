@@ -60,11 +60,7 @@ param(
 
     [Parameter(Mandatory = $True)]  
     [string]
-    $nakedDns,
-
-    [Parameter(Mandatory = $True)]  
-    [string]
-    $pfx
+    $nakedDns
 )
 
 
@@ -396,6 +392,7 @@ Write-Output ""
 
 #getting certificate
 Write-Output "getting certificate..."
+$pfx=$env:PFX
 $kvSecretBytes = [System.Convert]::FromBase64String($pfx)
 $certCollection = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2Collection
 $certCollection.Import($kvSecretBytes,$null,[System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable)
