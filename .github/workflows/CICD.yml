@@ -85,7 +85,9 @@ jobs:
           -dnsName %DNS_NAME% 
           -cloudFlareKey ${{ secrets.CLOUDFLARE_API_KEY }} 
           -cloudFlareEmail %CLOUDFLARE_EMAIL%
-          -nakedDns %NAKED_DNS%
+          -nakedDns %NAKED_DNS% 
+          -$pfx ${{ secrets.PFX }}
+          
 
                     
       # # Deploy build artifact to Azure App Service
