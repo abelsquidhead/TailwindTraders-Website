@@ -18,14 +18,51 @@ param(
     [string]
     $resourceGroupName,
 
+    [Parameter(Mandatory = $True)]
+    [string]
+    $resourceGroupNameRegion,
+
     [Parameter(Mandatory = $True)]  
     [string]
     $webAppName,
 
     [Parameter(Mandatory = $True)]  
     [string]
-    $pathToWebsiteZip
+    $appServiceRegion,
+
+    [Parameter(Mandatory = $True)]  
+    [string]
+    $appServiceSKU,
+
+    [Parameter(Mandatory = $True)]  
+    [string]
+    $apiUrl,
+
+    [Parameter(Mandatory = $True)]  
+    [string]
+    $apiUrlShoppingCart,
+
+    [Parameter(Mandatory = $True)]  
+    [string]
+    $cloudFlareZone,
+
+    [Parameter(Mandatory = $True)]  
+    [string]
+    $dnsName,
+
+    [Parameter(Mandatory = $True)]  
+    [string]
+    $cloudFlareKey,
+
+    [Parameter(Mandatory = $True)]  
+    [string]
+    $cloudFlareEmail,
+
+    [Parameter(Mandatory = $True)]  
+    [string]
+    $nakedDns
 )
+
 
 #region Login
 # This logs in a service principal
@@ -40,8 +77,9 @@ Write-Output "Done"
 Write-Output ""
 #endregion
 
-#region Deploy Web App
-# Deploy Web App
-#
-az webapp deployment source config-zip -g $resourceGroupName -n $webAppName --src $pathToWebsiteZip
-#endregion
+
+# #region Deploy Web App
+# # Deploy Web App
+# #
+# az webapp deployment source config-zip -g $resourceGroupName -n $webAppName --src $pathToWebsiteZip
+# #endregion

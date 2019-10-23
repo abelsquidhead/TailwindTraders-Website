@@ -119,13 +119,32 @@ jobs:
           SERVICE_PRINCIPAL: http://AbelDeployDemoPrincipal
           SERVICE_PRINCIPAL_TENANT: 72f988bf-86f1-41af-91ab-2d7cd011db47
           RESOURCE_GROUP: TailwindTraders-Web-Ignite-RG
-          WEB_APP: abeltailwindtraders
-          PATH_TO_WEBSITE_ZIP: .\webapp\Tailwind.Traders.web.zip
+          RESOURCE_GROUP_REGION: southcentralus
+          WEB_APP_NAME: abeltailwindtraders
+          APP_SERVICE_REGION: southcentralus
+          APP_SERVICE_SKU: P3V2 
+          API_URL: https://backend.tailwindtraders.com/webbff/v1
+          API_URL_SHOPPING_CART: https://backend.tailwindtraders.com/cart-api
+          CLOUDFLARE_ZONE: d1132c2a5c07edec69da294bd17adb33
+          CLOUDFLARE_ID: 15cc0ef41e07ee95b5e3ff18ca72c770
+          DNS_NAME: www.abeltailwindtraders.com
+          CLOUDFLARE_EMAIL: abel.wang@gmail.com
+          NAKED_DNS: abeltailwindtraders.com
+          PFX: ${{ secrets.PFX }}
         run: >
           powershell -command "& ./webapp/deployWebApp.ps1 "
           -servicePrincipal %SERVICE_PRINCIPAL% 
-          -servicePrincipalSecret ${{ secrets.SERVICE_PRINCIPAL_SECRET }}
-          -servicePrincipalTenantId %SERVICE_PRINCIPAL_TENANT
-          -resourceGroupName %RESOURCE_GROUP%
-          -webAppName %WEB_APP%
-          -pathToWebsiteZip %PATH_TO_WEBSITE_ZIP%
+          -servicePrincipalSecret ${{ secrets.SERVICE_PRINCIPAL_SECRET }} 
+          -servicePrincipalTenantId %SERVICE_PRINCIPAL_TENANT% 
+          -resourceGroupName %RESOURCE_GROUP% 
+          -resourceGroupNameRegion %RESOURCE_GROUP_REGION% 
+          -webAppName %WEB_APP_NAME% 
+          -appServiceRegion %APP_SERVICE_REGION%
+          -appServiceSKU %APP_SERVICE_SKU%
+          -apiUrl %API_URL% 
+          -apiUrlShoppingCart %API_URL_SHOPPING_CART% 
+          -cloudFlareZone %CLOUDFLARE_ZONE% 
+          -dnsName %DNS_NAME% 
+          -cloudFlareKey ${{ secrets.CLOUDFLARE_API_KEY }} 
+          -cloudFlareEmail %CLOUDFLARE_EMAIL%
+          -nakedDns %NAKED_DNS% 
