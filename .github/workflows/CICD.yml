@@ -121,12 +121,11 @@ jobs:
           RESOURCE_GROUP: TailwindTraders-Web-Ignite-RG
           WEB_APP: abeltailwindtraders
           PATH_TO_WEBSITE_ZIP: .\webapp\Tailwind.Traders.web.zip
-          WEB_APP_NAME: abeltailwindtraders
         run: >
           powershell -command "& ./webapp/deployWebApp.ps1 "
           -servicePrincipal %SERVICE_PRINCIPAL% 
           -servicePrincipalSecret ${{ secrets.SERVICE_PRINCIPAL_SECRET }}
-          -servicePrincipalTenant %SERVICE_PRINCIPAL_TENANT
+          -servicePrincipalTenantId %SERVICE_PRINCIPAL_TENANT
           -resourceGroupName %RESOURCE_GROUP%
           -webAppName %WEB_APP%
           -pathToWebsiteZip %PATH_TO_WEBSITE_ZIP%
