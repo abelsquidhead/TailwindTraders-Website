@@ -15,18 +15,6 @@ jobs:
     - name: Setup nuget
       uses: warrenbuckley/Setup-Nuget@v1
       
-    # restore packages from nuget
-    #- name: Restore packages with nuget
-    #  run: nuget restore ./Source/Tailwind.Traders.Web.sln
-    
-    # setup msbuild and put it in the path
-    # - name: Setup MSBuild.exe
-    #   uses: warrenbuckley/Setup-MSBuild@v1
-      
-    # build solution
-    #- name: Build solution
-    #  run: msbuild ./Source/Tailwind.Traders.Web.sln /nologo /nr:false /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:platform="Any CPU" /p:configuration="Release" /p:VisualStudioVersion="16.0" /p:PackageLocation="%GITHUB_WORKSPACE%\staging"
-    
     # copy zip to staging
     - name: Build solution
       run: |

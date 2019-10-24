@@ -16,33 +16,17 @@ jobs:
       uses: warrenbuckley/Setup-Nuget@v1
       
     # restore packages from nuget
-    #- name: Restore packages with nuget
-    #  run: nuget restore ./Source/Tailwind.Traders.Web.sln
+    - name: Restore packages with nuget
+     run: nuget restore ./Source/Tailwind.Traders.Web.sln
     
     # setup msbuild and put it in the path
-    # - name: Setup MSBuild.exe
-    #   uses: warrenbuckley/Setup-MSBuild@v1
+    - name: Setup MSBuild.exe
+      uses: warrenbuckley/Setup-MSBuild@v1
       
     # build solution
-    #- name: Build solution
-    #  run: msbuild ./Source/Tailwind.Traders.Web.sln /nologo /nr:false /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:platform="Any CPU" /p:configuration="Release" /p:VisualStudioVersion="16.0" /p:PackageLocation="%GITHUB_WORKSPACE%\staging"
-    
-    # copy zip to staging
     - name: Build solution
-      run: |
-        mkdir staging
-        copy .\Deploy\Tailwind.Traders.web.zip .\staging
-        copy .\Deploy\AzCLI\deployWebApp.ps1 .\staging
-
-    - name: show staging
-      run: |
-        echo cd staging
-        cd staging
-        echo pwd
-        pwd
-        echo ls
-        ls
-
+      run: msbuild ./Source/Tailwind.Traders.Web.sln /nologo /nr:false /p:DeployOnBuild=true /p:DeployDefaultTarget=WebPublish /p:WebPublishMethod=FileSystem /p:SkipInvalidConfigurations=true /p:platform="Any CPU" /p:configuration="Release" /p:VisualStudioVersion="16.0" /p:publishUrl="%GITHUB_WORKSPACE%\staging
+    
     # upload build artifact
     - name: Publish build artifacts back to GitHub
       uses: actions/upload-artifact@master
@@ -104,29 +88,10 @@ jobs:
         with:
           name: webapp
 
-      - name: show webapp directory
-        run: |
-          echo cd webapp
-          cd webapp
-          echo pwd
-          pwd
-          echo ls
-          ls
-          
       # deploy web app
-      - name: Deploy web app
-        env:
-          SERVICE_PRINCIPAL: http://AbelDeployDemoPrincipal
-          SERVICE_PRINCIPAL_TENANT: 72f988bf-86f1-41af-91ab-2d7cd011db47
-          RESOURCE_GROUP: TailwindTraders-Web-Ignite-RG
-          WEB_APP: abeltailwindtraders
-          PATH_TO_WEBSITE_ZIP: .\webapp\Tailwind.Traders.web.zip
-          WEB_APP_NAME: abeltailwindtraders
-        run: >
-          powershell -command "& ./webapp/deployWebApp.ps1 "
-          -servicePrincipal %SERVICE_PRINCIPAL% 
-          -servicePrincipalSecret ${{ secrets.SERVICE_PRINCIPAL_SECRET }}
-          -servicePrincipalTenant %SERVICE_PRINCIPAL_TENANT
-          -resourceGroupName %RESOURCE_GROUP%
-          -webAppName %WEB_APP%
-          -pathToWebsiteZip %PATH_TO_WEBSITE_ZIP%
+      - uses: azure/webapps-deploy@v1
+        with: 
+          app-name: abeltailwindtraders
+          publish-profile: ${{ secrets.WEBSITE_PUBLISH_PROFILE }}
+          working-directory: Source\Tailwind.Traders.Web
+          package: webapp\Tailwind.Traders.Web
