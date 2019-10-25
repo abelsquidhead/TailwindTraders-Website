@@ -143,6 +143,7 @@ Write-Output "done creating app insight for node 1: $appInsightCreateResponse"
 Write-Output ""
 #endregion
 
+#region set dns at cloudflare
 #region get all dns records from cloudflare
 # this lists all dns records from cloudflare
 #
@@ -388,6 +389,7 @@ $addRuleResponse = Invoke-RestMethod "https://api.cloudflare.com/client/v4/zones
 Write-Output $addRuleResponse
 Write-Output "done adding apex domain rule"
 Write-Output ""
+#endregion
 #endregion
 
 #region getting certificate
