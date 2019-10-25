@@ -20,14 +20,14 @@ class UploadFile extends Component {
         
         ProductService.getRelatedProducts(formData, this.props.userInfo.token)
             .then((relatedProducts) => {
-                if (relatedProducts.length > 0) {
+                if (relatedProducts.length > 1) {
                     this.props.history.push({
-                        pathname: "/suggested-products-lists",
+                        pathname: "/suggested-products-list",
                         state: { relatedProducts },
                     });
                 }else {
                     this.props.history.push({
-                        pathname: `/product/details/${relatedProducts[4].id}`,
+                        pathname: `/product/detail/${relatedProducts[0].id}`,
                     });
                 }
             })
