@@ -22,7 +22,7 @@ class UploadFile extends Component {
             .then((relatedProducts) => {
                 if (relatedProducts.length > 1) {
                     this.props.history.push({
-                        pathname: "/suggested-products-list",
+                        pathname: "/suggested-products-lists",
                         state: { relatedProducts },
                     });
                 }else {
