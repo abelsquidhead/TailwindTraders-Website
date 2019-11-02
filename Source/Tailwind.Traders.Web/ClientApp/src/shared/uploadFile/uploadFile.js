@@ -29,7 +29,7 @@ class UploadFile extends Component {
                     this.props.history.push({
                         pathname: `/product/details/${relatedProducts[0].id}`,
                     });
-                }   
+                }                    
             })                 
             .catch(() => {
                 Alert.error("There was an error uploading the image, please try again", {
@@ -39,8 +39,7 @@ class UploadFile extends Component {
                     timeout: 6000,
                 });
             });                    
-
-        }
+    }
 
     resetFileValue(e) {
         e.target.value = null;
