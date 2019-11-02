@@ -38,11 +38,7 @@ class UploadFile extends Component {
                     beep: true,
                     timeout: 6000,
                 });
-<<<<<<< HEAD
             });                    
-=======
-            });       
->>>>>>> f1a58750404fb4b20655aab3803653d2411c77bb
     }
 
     resetFileValue(e) {
