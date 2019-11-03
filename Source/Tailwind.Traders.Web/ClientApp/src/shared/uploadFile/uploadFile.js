@@ -30,7 +30,7 @@ class UploadFile extends Component {
                         pathname: `/product/details/${relatedProducts[0].id}`,
                     });
                 }                                 
-            })     
+            })          
             .catch(() => {
                 Alert.error("There was an error uploading the image, please try again", {
                     position: "top",
