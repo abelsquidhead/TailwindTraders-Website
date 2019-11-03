@@ -22,15 +22,24 @@ class UploadFile extends Component {
             .then((relatedProducts) => {
                 if (relatedProducts.length > 1) {
                     this.props.history.push({
+<<<<<<< HEAD
                         pathname: "/suggested-products-lists",
+=======
+                        pathname: "/new-products-list",
+>>>>>>> 95418a82224af9e49b02286709fc432c1d601058
                         state: { relatedProducts },
                     });
                 }else {
                     this.props.history.push({
                         pathname: `/product/details/${relatedProducts[0].id}`,
                     });
+<<<<<<< HEAD
                 }            
             })               
+=======
+                }                    
+            })                 
+>>>>>>> 95418a82224af9e49b02286709fc432c1d601058
             .catch(() => {
                 Alert.error("There was an error uploading the image, please try again", {
                     position: "top",
@@ -38,11 +47,7 @@ class UploadFile extends Component {
                     beep: true,
                     timeout: 6000,
                 });
-<<<<<<< HEAD
             });                    
-=======
-            });       
->>>>>>> f1a58750404fb4b20655aab3803653d2411c77bb
     }
 
     resetFileValue(e) {
