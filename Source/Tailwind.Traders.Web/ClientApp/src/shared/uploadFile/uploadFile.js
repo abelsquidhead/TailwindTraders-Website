@@ -29,12 +29,8 @@ class UploadFile extends Component {
                     this.props.history.push({
                         pathname: `/product/details/${relatedProducts[0].id}`,
                     });
-                }                                 
-<<<<<<< HEAD
-            })               
-=======
-            })                    
->>>>>>> 0c04f0320fc31706526dff38aa01774ae179c582
+                } 
+            })
             .catch(() => {
                 Alert.error("There was an error uploading the image, please try again", {
                     position: "top",
