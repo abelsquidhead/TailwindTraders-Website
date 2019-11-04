@@ -30,7 +30,11 @@ class UploadFile extends Component {
                         pathname: `/product/details/${relatedProducts[0].id}`,
                     });
                 }                                 
+<<<<<<< HEAD
             })               
+=======
+            })                    
+>>>>>>> 0c04f0320fc31706526dff38aa01774ae179c582
             .catch(() => {
                 Alert.error("There was an error uploading the image, please try again", {
                     position: "top",
@@ -38,7 +42,7 @@ class UploadFile extends Component {
                     beep: true,
                     timeout: 6000,
                 });
-            });                    
+            });                          
     }
 
     resetFileValue(e) {
@@ -73,4 +77,4 @@ class UploadFile extends Component {
 
 const mapStateToProps = state => state.login;
 
-export default connect(mapStateToProps)(withRouter(UploadFile));
+export default connect(mapStateToProps)(withRouter(UploadFile));  
