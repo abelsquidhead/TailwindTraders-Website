@@ -61,9 +61,12 @@ stages:
 
 - stage: Deploy
   jobs:
-  - job: Deploy Web Front End
-  - job: Deploy Backend
-  - job: Deploy DB Schema
+  - job: DeployWebFrontEnd
+    displayName: Deploy Web Front End to IIS
+  - job: DeployBackend
+    displayName: Deploy Backend
+  - job: DeployDBSchema
+    displayName: Deploy DB Schema to SQL Server
 # - stage: ProvisionDevInfra
 #   jobs:
 #   - deployment: ProvisionDevInfra
