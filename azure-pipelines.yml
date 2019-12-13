@@ -59,6 +59,11 @@ stages:
         ArtifactName: 'drop'
         publishLocation: 'Container'
 
+- stage: Deploy
+  jobs:
+  - job: Deploy Web Front End
+  - job: Deploy Backend
+  - job: Deploy DB Schema
 # - stage: ProvisionDevInfra
 #   jobs:
 #   - deployment: ProvisionDevInfra
