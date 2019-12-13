@@ -38,7 +38,7 @@ stages:
         
     - task: VSBuild@1
       inputs:
-        solution: 'TailwindsTrader-Website/Source/Tailwind.Traders.Web.sln'
+        solution: 'TailwindTrader-Website/Source/Tailwind.Traders.Web.sln'
         msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactStagingDirectory)"'
         platform: '$(buildPlatform)'
         configuration: '$(buildConfiguration)'
