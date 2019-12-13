@@ -59,14 +59,17 @@ stages:
         ArtifactName: 'drop'
         publishLocation: 'Container'
 
-- stage: Deploy
-  jobs:
-  - job: DeployWebFrontEnd
-    displayName: Deploy Web Front End to IIS
-  - job: DeployBackend
-    displayName: Deploy Backend
-  - job: DeployDBSchema
-    displayName: Deploy DB Schema to SQL Server
+- stage: DeployWebFrontEnd
+  displayName: Deploy web front end to iis
+  dependsOn: Build
+- stage: DeployBackEnd
+  displayName: Deploy back end code
+  dependsOn: Build
+-stage: DeployDB
+  displayName: Deploy schema changes to sql server
+  dependsOn: Build
+  
+  
 # - stage: ProvisionDevInfra
 #   jobs:
 #   - deployment: ProvisionDevInfra
