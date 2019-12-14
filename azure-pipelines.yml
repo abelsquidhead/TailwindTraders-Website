@@ -27,32 +27,25 @@ stages:
   - job: BuildJob
     pool:
       vmImage: 'windows-latest'
-
     steps:
-
     - task: NuGetToolInstaller@1
-
     - task: NuGetCommand@2
       inputs:
         restoreSolution: 'Source/Tailwind.Traders.Web.sln'
-        
     - task: VSBuild@1
       inputs:
         solution: 'Source/Tailwind.Traders.Web.sln'
         msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactStagingDirectory)"'
         platform: '$(buildPlatform)'
         configuration: '$(buildConfiguration)'
-
     - task: VSTest@2
       inputs:
         platform: '$(buildPlatform)'
         configuration: '$(buildConfiguration)'
-
     - task: CopyFiles@2
       inputs:
         SourceFolder: 'Deploy'
         TargetFolder: '$(Build.ArtifactStagingDirectory)'
-
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
@@ -62,12 +55,42 @@ stages:
 - stage: DeployWebFrontEnd
   displayName: Web front end to iis
   dependsOn: Build
+  jobs:
+  - deployment: DeployWebFrontEnd
+    displayName: Deploy web to IIS
+    pool:
+      name: Hosted Windows 2019 with VS2019
+    variables:
+      adminlogin: abel
+      servername: abellearndbserverdev1
+      webAppName: abellearndbwebappdev1
+      failoverName: learndbserverfailoverdev1
+      partnerServerName: learndbserver2dev1
+      trafficManagerProfileName: abellearndbtmdev1
+      uniqueDNSName: abellearndbuniquedev1
+      storageAccountName: abellearndbstoragedev1
+    environment: 'courses-dev-provisionInfra'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+            patterns: '**/*'
+          - task: PowerShell@2
+            displayName : 'Provision DB and Web'
+            inputs:
+              filePath: '$(Pipeline.Workspace)/drop/IaC/provisionWebDB.ps1'
+              arguments: '-servicePrincipal $(servicePrincipal) -servicePrincipalSecret $(servicePrincipalSecret) -servicePrincipalTenantId $(servicePrincipalTenantId) -azureSubscriptionName "$(azureSubscriptionName)" -resourceGroupName $(resourceGroupName) -location $(location) -adminlogin $(adminlogin) -adminPassword $(adminPasswordDev) -servername $(servername) -startip $(startip) -endip $(endip) -dbName $(dbName) -dbEdition $(dbEdition) -dbFamily $(dbFamily) -dbCapacity $(dbCapacity) -dbZoneRedundant $(dbZoneRedundant) -webAppName $(webAppName) -webAppSku $(webAppSku) -releaseDirectory $(Pipeline.Workspace) -failoverName $(failoverName) -partnerServerName $(partnerServerName) -partnerServerLocation $(partnerServerLocation) -trafficManagerProfileName $(trafficManagerProfileName) -uniqueDNSName $(uniqueDNSName) -node2Location $(node2Location) -storageAccountName $(storageAccountName) -storageAccountSku $(storageAccountSku)'
+
 - stage: DeployBackEnd
   displayName: Back end code
   dependsOn: Build
+
 - stage: DeployDB
-  displayName: Schema changes to sql server
+  displayName: DB schema changes
   dependsOn: Build
+
 - stage: SeleniumWebTests
   displayName: Selenium Tests
   dependsOn: [DeployWebFrontEnd, DeployBackEnd, DeployDB]
