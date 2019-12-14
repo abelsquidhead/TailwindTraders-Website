@@ -165,7 +165,7 @@ stages:
               targetType: 'inline'
               script: |
                 Write-Host "Helm upgrade..."
-                Start-Sleep -s 38
+                Start-Sleep -s 68
                 Write-Host "Done helm upgrade."                  
 
 - stage: DeployDB
