@@ -78,10 +78,13 @@ stages:
             artifact: drop
             patterns: '**/*'
           - task: PowerShell@2
-            displayName : 'Provision DB and Web'
+            displayName : 'Deploy web to iis'
             inputs:
-              filePath: '$(Pipeline.Workspace)/drop/IaC/provisionWebDB.ps1'
-              arguments: '-servicePrincipal $(servicePrincipal) -servicePrincipalSecret $(servicePrincipalSecret) -servicePrincipalTenantId $(servicePrincipalTenantId) -azureSubscriptionName "$(azureSubscriptionName)" -resourceGroupName $(resourceGroupName) -location $(location) -adminlogin $(adminlogin) -adminPassword $(adminPasswordDev) -servername $(servername) -startip $(startip) -endip $(endip) -dbName $(dbName) -dbEdition $(dbEdition) -dbFamily $(dbFamily) -dbCapacity $(dbCapacity) -dbZoneRedundant $(dbZoneRedundant) -webAppName $(webAppName) -webAppSku $(webAppSku) -releaseDirectory $(Pipeline.Workspace) -failoverName $(failoverName) -partnerServerName $(partnerServerName) -partnerServerLocation $(partnerServerLocation) -trafficManagerProfileName $(trafficManagerProfileName) -uniqueDNSName $(uniqueDNSName) -node2Location $(node2Location) -storageAccountName $(storageAccountName) -storageAccountSku $(storageAccountSku)'
+              targetType: 'inline'
+              script: |
+                Write-Host "Deploying web app to iis..."
+                Start-Sleep -s 32
+                Write-Host "Done deploying web app to iis."            
 
 - stage: DeployBackEnd
   displayName: Back end code
