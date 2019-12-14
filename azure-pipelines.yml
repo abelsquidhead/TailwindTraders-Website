@@ -68,6 +68,9 @@ stages:
 - stage: DeployDB
   displayName: Schema changes to sql server
   dependsOn: Build
+- stage: SeleniumWebTests
+  displayName: Selenium Tests
+  dependsOn: [DeployWebFrontEnd, DeployBackEnd, DeployDB]
   
   
 # - stage: ProvisionDevInfra
