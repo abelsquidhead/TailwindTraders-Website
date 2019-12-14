@@ -60,13 +60,13 @@ stages:
         publishLocation: 'Container'
 
 - stage: DeployWebFrontEnd
-  displayName: Deploy web front end to iis
+  displayName: Web front end to iis
   dependsOn: Build
 - stage: DeployBackEnd
-  displayName: Deploy back end code
+  displayName: Back end code
   dependsOn: Build
 - stage: DeployDB
-  displayName: Deploy schema changes to sql server
+  displayName: Schema changes to sql server
   dependsOn: Build
   
   
