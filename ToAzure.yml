@@ -86,6 +86,33 @@ stages:
 - stage: DeployBackEnd
   displayName: Back end code
   dependsOn: Build
+  jobs:
+  - deployment: DeployBackEndCode
+    displayName: Deploy back end services
+    pool:
+      name: Hosted Windows 2019 with VS2019
+    variables:
+      adminlogin: abel
+      servername: abellearndbserverdev1
+      webAppName: abellearndbwebappdev1
+      failoverName: learndbserverfailoverdev1
+      partnerServerName: learndbserver2dev1
+      trafficManagerProfileName: abellearndbtmdev1
+      uniqueDNSName: abellearndbuniquedev1
+      storageAccountName: abellearndbstoragedev1
+    environment: 'courses-dev-provisionInfra'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+            patterns: '**/*'
+          - task: PowerShell@2
+            displayName : 'Provision DB and Web'
+            inputs:
+              filePath: '$(Pipeline.Workspace)/drop/IaC/provisionWebDB.ps1'
+              arguments: '-servicePrincipal $(servicePrincipal) -servicePrincipalSecret $(servicePrincipalSecret) -servicePrincipalTenantId $(servicePrincipalTenantId) -azureSubscriptionName "$(azureSubscriptionName)" -resourceGroupName $(resourceGroupName) -location $(location) -adminlogin $(adminlogin) -adminPassword $(adminPasswordDev) -servername $(servername) -startip $(startip) -endip $(endip) -dbName $(dbName) -dbEdition $(dbEdition) -dbFamily $(dbFamily) -dbCapacity $(dbCapacity) -dbZoneRedundant $(dbZoneRedundant) -webAppName $(webAppName) -webAppSku $(webAppSku) -releaseDirectory $(Pipeline.Workspace) -failoverName $(failoverName) -partnerServerName $(partnerServerName) -partnerServerLocation $(partnerServerLocation) -trafficManagerProfileName $(trafficManagerProfileName) -uniqueDNSName $(uniqueDNSName) -node2Location $(node2Location) -storageAccountName $(storageAccountName) -storageAccountSku $(storageAccountSku)'
 
 - stage: DeployDB
   displayName: DB schema changes

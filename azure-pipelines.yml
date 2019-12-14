@@ -89,6 +89,44 @@ stages:
 - stage: DeployBackEnd
   displayName: Back end code
   dependsOn: Build
+  jobs:
+  - deployment: DeployBackEndCode
+    displayName: Deploy back end services
+    pool:
+      name: Hosted Windows 2019 with VS2019
+    variables:
+      adminlogin: abel
+      servername: abellearndbserverdev1
+      webAppName: abellearndbwebappdev1
+      failoverName: learndbserverfailoverdev1
+      partnerServerName: learndbserver2dev1
+      trafficManagerProfileName: abellearndbtmdev1
+      uniqueDNSName: abellearndbuniquedev1
+      storageAccountName: abellearndbstoragedev1
+    environment: 'courses-dev-provisionInfra'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+            patterns: '**/*'
+          - task: PowerShell@2
+            displayName : 'Deploy back end services'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Deploying back end services..."
+                Start-Sleep -s 48
+                Write-Host "Done deploying back end services."         
+          - task: PowerShell@2
+            displayName : 'Restart service'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Restarting service..."
+                Start-Sleep -s 11
+                Write-Host "Done deploying back end services."            
 
 - stage: DeployDB
   displayName: DB schema changes
