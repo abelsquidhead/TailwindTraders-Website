@@ -53,11 +53,11 @@ stages:
         publishLocation: 'Container'
 
 - stage: DeployWebFrontEnd
-  displayName: Web front end to iis
+  displayName: Deploy App Service
   dependsOn: Build
   jobs:
   - deployment: DeployWebFrontEnd
-    displayName: Deploy web to IIS
+    displayName: Deploy web to App Service
     pool:
       name: Hosted Windows 2019 with VS2019
     variables:
@@ -78,20 +78,20 @@ stages:
             artifact: drop
             patterns: '**/*'
           - task: PowerShell@2
-            displayName : 'Deploy web to iis'
+            displayName : 'Deploy web to App Service'
             inputs:
               targetType: 'inline'
               script: |
-                Write-Host "Deploying web app to iis..."
+                Write-Host "App Service deploy..."
                 Start-Sleep -s 32
-                Write-Host "Done deploying web app to iis."            
+                Write-Host "Done deploying app service deploy."            
 
 - stage: DeployBackEnd
-  displayName: Back end code
+  displayName: Deploy K8s
   dependsOn: Build
   jobs:
   - deployment: DeployBackEndCode
-    displayName: Deploy back end services
+    displayName: Deploy backend to K8s
     pool:
       name: Hosted Windows 2019 with VS2019
     variables:
@@ -112,24 +112,64 @@ stages:
             artifact: drop
             patterns: '**/*'
           - task: PowerShell@2
-            displayName : 'Deploy back end services'
+            displayName : 'Azure CLI: Preserve Cluster Tags'
             inputs:
               targetType: 'inline'
               script: |
-                Write-Host "Deploying back end services..."
-                Start-Sleep -s 48
-                Write-Host "Done deploying back end services."         
+                Write-Host "Preserving cluster tags..."
+                Start-Sleep -s 1
+                Write-Host "Done preserving cluster tags."         
           - task: PowerShell@2
-            displayName : 'Restart service'
+            displayName : 'Azure Deployment: Create AKS Cluster'
             inputs:
               targetType: 'inline'
               script: |
-                Write-Host "Restarting service..."
-                Start-Sleep -s 11
-                Write-Host "Done deploying back end services."            
+                Write-Host "Creating AKS cluster..."
+                Start-Sleep -s 23
+                Write-Host "Done creating AKS cluster."            
+          - task: PowerShell@2
+            displayName : 'Extract Resource Information'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Extract Resource Information..."
+                Start-Sleep -s 1
+                Write-Host "Done extracting resource information."  
+          - task: PowerShell@2
+            displayName : 'kubectl setup tiller environment'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Setting up tiller..."
+                Start-Sleep -s 7
+                Write-Host "Done setting up tiller."                  
+          - task: PowerShell@2
+            displayName : 'Install Helm'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Installing helm..."
+                Start-Sleep -s 2
+                Write-Host "Done installing helm."                  
+          - task: PowerShell@2
+            displayName : 'Helm init'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Helm init..."
+                Start-Sleep -s 8
+                Write-Host "Done installing helm."                  
+          - task: PowerShell@2
+            displayName : 'Helm upgrade'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Helm upgrade..."
+                Start-Sleep -s 38
+                Write-Host "Done helm upgrade."                  
 
 - stage: DeployDB
-  displayName: DB schema changes
+  displayName: Az SQL schema changes
   dependsOn: Build
   jobs:
   - deployment: DeployDBSchema
