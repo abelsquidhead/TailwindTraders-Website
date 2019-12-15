@@ -205,6 +205,51 @@ stages:
                 Write-Host "Done deploying db schema."         
 
 - stage: SeleniumWebTestsDev
+  displayName: Selenium Web Tests - Dev
+  dependsOn: Build
+  jobs:
+  - deployment: SeleniumWebTestsDev
+    displayName: Selenium Web Tests 
+    pool:
+      name: Hosted Windows 2019 with VS2019
+    variables:
+      adminlogin: abel
+      servername: abellearndbserverdev1
+      webAppName: abellearndbwebappdev1
+      failoverName: learndbserverfailoverdev1
+      partnerServerName: learndbserver2dev1
+      trafficManagerProfileName: abellearndbtmdev1
+      uniqueDNSName: abellearndbuniquedev1
+      storageAccountName: abellearndbstoragedev1
+    environment: 'forester-db-beta'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+            patterns: '**/*'
+          - task: PowerShell@2
+            displayName : 'Dacpac deploy'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Running selenium web ui tests..."
+                Start-Sleep -s 67
+                Write-Host "Done running selenium tests."
+
+
+
+
+
+
+
+
+
+
+
+
+- stage: SeleniumWebTestsDev
   displayName: Selenium Tests - Dev
   dependsOn: [DeployWebFrontEndDev, DeployBackEndDev, DeployDBDev]
   jobs:
