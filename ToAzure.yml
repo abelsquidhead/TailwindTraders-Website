@@ -20,8 +20,8 @@ variables:
   partnerServerLocation: westus2
   node2Location: westus
   storageAccountSku: Standard_LRS
-  # buildPlatform: "any cpu"
-  # buildConfiguration: release
+  buildPlatform: "Any CPU"
+  buildConfiguration: Release
   
 stages:
 - stage: Build
