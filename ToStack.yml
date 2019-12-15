@@ -20,6 +20,8 @@ variables:
   partnerServerLocation: westus2
   node2Location: westus
   storageAccountSku: Standard_LRS
+  buildPlatform: "Any CPU"
+  buildConfiguration: Release
   
 stages:
 - stage: Build
@@ -52,12 +54,12 @@ stages:
         ArtifactName: 'drop'
         publishLocation: 'Container'
 
-- stage: DeployWebFrontEnd
-  displayName: Web front end to Az Stack
+- stage: DeployWebFrontEndStack
+  displayName: Deploy App Service - Az Stack
   dependsOn: Build
   jobs:
   - deployment: DeployWebFrontEnd
-    displayName: Deploy web to app service Stack
+    displayName: Deploy web to App Service
     pool:
       name: Hosted Windows 2019 with VS2019
     variables:
@@ -78,20 +80,20 @@ stages:
             artifact: drop
             patterns: '**/*'
           - task: PowerShell@2
-            displayName : 'Deploy web to iis'
+            displayName : 'Deploy web to App Service'
             inputs:
               targetType: 'inline'
               script: |
-                Write-Host "Deploying web app to iis..."
+                Write-Host "App Service deploy..."
                 Start-Sleep -s 32
-                Write-Host "Done deploying web app to iis."            
+                Write-Host "Done deploying app service deploy."            
 
-- stage: DeployBackEnd
-  displayName: Back end K8s Az Stack
+- stage: DeployBackEndStack
+  displayName: Deploy K8s - Stack
   dependsOn: Build
   jobs:
   - deployment: DeployBackEndCode
-    displayName: Deploy back end services k8s 
+    displayName: Deploy backend to K8s Az Stack
     pool:
       name: Hosted Windows 2019 with VS2019
     variables:
@@ -112,28 +114,68 @@ stages:
             artifact: drop
             patterns: '**/*'
           - task: PowerShell@2
-            displayName : 'Deploy back end services'
+            displayName : 'Azure CLI: Preserve Cluster Tags'
             inputs:
               targetType: 'inline'
               script: |
-                Write-Host "Deploying back end services..."
-                Start-Sleep -s 48
-                Write-Host "Done deploying back end services."         
+                Write-Host "Preserving cluster tags..."
+                Start-Sleep -s 1
+                Write-Host "Done preserving cluster tags."         
           - task: PowerShell@2
-            displayName : 'Restart service'
+            displayName : 'Azure Deployment: Create AKS Cluster'
             inputs:
               targetType: 'inline'
               script: |
-                Write-Host "Restarting service..."
-                Start-Sleep -s 11
-                Write-Host "Done deploying back end services."            
+                Write-Host "Creating AKS cluster..."
+                Start-Sleep -s 23
+                Write-Host "Done creating AKS cluster."            
+          - task: PowerShell@2
+            displayName : 'Extract Resource Information'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Extract Resource Information..."
+                Start-Sleep -s 1
+                Write-Host "Done extracting resource information."  
+          - task: PowerShell@2
+            displayName : 'kubectl setup tiller environment'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Setting up tiller..."
+                Start-Sleep -s 7
+                Write-Host "Done setting up tiller."                  
+          - task: PowerShell@2
+            displayName : 'Install Helm'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Installing helm..."
+                Start-Sleep -s 2
+                Write-Host "Done installing helm."                  
+          - task: PowerShell@2
+            displayName : 'Helm init'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Helm init..."
+                Start-Sleep -s 8
+                Write-Host "Done installing helm."                  
+          - task: PowerShell@2
+            displayName : 'Helm upgrade'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Helm upgrade..."
+                Start-Sleep -s 68
+                Write-Host "Done helm upgrade."                  
 
-- stage: DeployDB
-  displayName: DB schema changes Stack
+- stage: DeployDBStack
+  displayName: SQL schema changes - Stack
   dependsOn: Build
   jobs:
   - deployment: DeployDBSchema
-    displayName: Deploy db schema Stack
+    displayName: Deploy db schema
     pool:
       name: Hosted Windows 2019 with VS2019
     variables:
@@ -164,12 +206,12 @@ stages:
                 Write-Host "Done with Dacpac deploy."
                 Write-Host "Done deploying db schema."         
 
-- stage: SeleniumWebTests
-  displayName: Selenium Tests
-  dependsOn: [DeployWebFrontEnd, DeployBackEnd, DeployDB]
+- stage: SeleniumWebTestsStack
+  displayName: Selenium Web Tests - Dev
+  dependsOn: [DeployWebFrontEndStack, DeployBackEndStack, DeployDBStack]
   jobs:
-  - deployment: SeleniumWebTest
-    displayName: Selenium Web Tests
+  - deployment: SeleniumWebTestsStack
+    displayName: Selenium Web Tests 
     pool:
       name: Hosted Windows 2019 with VS2019
     variables:
@@ -181,7 +223,7 @@ stages:
       trafficManagerProfileName: abellearndbtmdev1
       uniqueDNSName: abellearndbuniquedev1
       storageAccountName: abellearndbstoragedev1
-    environment: 'forester-selenium-beta'
+    environment: 'forester-db-beta'
     strategy:
       runOnce:
         deploy:
@@ -190,13 +232,10 @@ stages:
             artifact: drop
             patterns: '**/*'
           - task: PowerShell@2
-            displayName : 'Selenium web tests'
+            displayName : 'Run Selenium Tests'
             inputs:
               targetType: 'inline'
               script: |
-                Write-Host "Deploying db schema..."
-                Write-Host "Dacpac deploy..."
-                Start-Sleep -s 52
-                Write-Host "Done with Dacpac deploy."
-                Write-Host "Done deploying db schema."         
-  
+                Write-Host "Running selenium web ui tests..."
+                Start-Sleep -s 67
+                Write-Host "Done running selenium tests."
