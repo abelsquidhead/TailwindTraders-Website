@@ -1,0 +1,202 @@
+name: $(Date:yyyMMdd)$(Rev:.r)
+trigger:
+  batch: false # batch changes if true (the default); start a new build for every push if false
+  branches:
+    include: [ main ] # branch names which will trigger a build
+variables:
+  servicePrincipal: http://AbelDeployPrincipal
+  servicePrincipalTenantId: 72f988bf-86f1-41af-91ab-2d7cd011db47
+  azureSubscriptionName: ca-abewan-demo-test
+  resourceGroupName: abellearndbrg4
+  location: southcentralus
+  startip: 0.0.0.0
+  endip: 0.0.0.0
+  dbName: learndb
+  dbEdition: GeneralPurpose
+  dbFamily: Gen4
+  dbCapacity: 1
+  dbZoneRedundant: false
+  webAppSku: S1
+  partnerServerLocation: westus2
+  node2Location: westus
+  storageAccountSku: Standard_LRS
+  
+stages:
+- stage: Build
+  jobs:
+  - job: BuildJob
+    pool:
+      vmImage: 'windows-latest'
+    steps:
+    - task: NuGetToolInstaller@1
+    - task: NuGetCommand@2
+      inputs:
+        restoreSolution: 'Source/Tailwind.Traders.Web.sln'
+    # - task: VSBuild@1
+    #   inputs:
+    #     solution: 'Source/Tailwind.Traders.Web.sln'
+    #     msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactStagingDirectory)"'
+    #     platform: '$(buildPlatform)'
+    #     configuration: '$(buildConfiguration)'
+    # - task: VSTest@2
+    #   inputs:
+    #     platform: '$(buildPlatform)'
+    #     configuration: '$(buildConfiguration)'
+    - task: CopyFiles@2
+      inputs:
+        SourceFolder: 'Deploy'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
+
+- stage: DeployWebFrontEnd
+  displayName: Web front end to Az Stack
+  dependsOn: Build
+  jobs:
+  - deployment: DeployWebFrontEnd
+    displayName: Deploy web to app service Stack
+    pool:
+      name: Hosted Windows 2019 with VS2019
+    variables:
+      adminlogin: abel
+      servername: abellearndbserverdev1
+      webAppName: abellearndbwebappdev1
+      failoverName: learndbserverfailoverdev1
+      partnerServerName: learndbserver2dev1
+      trafficManagerProfileName: abellearndbtmdev1
+      uniqueDNSName: abellearndbuniquedev1
+      storageAccountName: abellearndbstoragedev1
+    environment: 'forester-web-beta'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+            patterns: '**/*'
+          - task: PowerShell@2
+            displayName : 'Deploy web to iis'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Deploying web app to iis..."
+                Start-Sleep -s 32
+                Write-Host "Done deploying web app to iis."            
+
+- stage: DeployBackEnd
+  displayName: Back end code
+  dependsOn: Build
+  jobs:
+  - deployment: DeployBackEndCode
+    displayName: Deploy back end services
+    pool:
+      name: Hosted Windows 2019 with VS2019
+    variables:
+      adminlogin: abel
+      servername: abellearndbserverdev1
+      webAppName: abellearndbwebappdev1
+      failoverName: learndbserverfailoverdev1
+      partnerServerName: learndbserver2dev1
+      trafficManagerProfileName: abellearndbtmdev1
+      uniqueDNSName: abellearndbuniquedev1
+      storageAccountName: abellearndbstoragedev1
+    environment: 'forester-api-beta'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+            patterns: '**/*'
+          - task: PowerShell@2
+            displayName : 'Deploy back end services'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Deploying back end services..."
+                Start-Sleep -s 48
+                Write-Host "Done deploying back end services."         
+          - task: PowerShell@2
+            displayName : 'Restart service'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Restarting service..."
+                Start-Sleep -s 11
+                Write-Host "Done deploying back end services."            
+
+- stage: DeployDB
+  displayName: DB schema changes
+  dependsOn: Build
+  jobs:
+  - deployment: DeployDBSchema
+    displayName: Deploy db schema
+    pool:
+      name: Hosted Windows 2019 with VS2019
+    variables:
+      adminlogin: abel
+      servername: abellearndbserverdev1
+      webAppName: abellearndbwebappdev1
+      failoverName: learndbserverfailoverdev1
+      partnerServerName: learndbserver2dev1
+      trafficManagerProfileName: abellearndbtmdev1
+      uniqueDNSName: abellearndbuniquedev1
+      storageAccountName: abellearndbstoragedev1
+    environment: 'forester-db-beta'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+            patterns: '**/*'
+          - task: PowerShell@2
+            displayName : 'Dacpac deploy'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Deploying db schema..."
+                Write-Host "Dacpac deploy..."
+                Start-Sleep -s 61
+                Write-Host "Done with Dacpac deploy."
+                Write-Host "Done deploying db schema."         
+
+- stage: SeleniumWebTests
+  displayName: Selenium Tests
+  dependsOn: [DeployWebFrontEnd, DeployBackEnd, DeployDB]
+  jobs:
+  - deployment: SeleniumWebTest
+    displayName: Selenium Web Tests
+    pool:
+      name: Hosted Windows 2019 with VS2019
+    variables:
+      adminlogin: abel
+      servername: abellearndbserverdev1
+      webAppName: abellearndbwebappdev1
+      failoverName: learndbserverfailoverdev1
+      partnerServerName: learndbserver2dev1
+      trafficManagerProfileName: abellearndbtmdev1
+      uniqueDNSName: abellearndbuniquedev1
+      storageAccountName: abellearndbstoragedev1
+    environment: 'forester-selenium-beta'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+            patterns: '**/*'
+          - task: PowerShell@2
+            displayName : 'Selenium web tests'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Deploying db schema..."
+                Write-Host "Dacpac deploy..."
+                Start-Sleep -s 52
+                Write-Host "Done with Dacpac deploy."
+                Write-Host "Done deploying db schema."         
+  
