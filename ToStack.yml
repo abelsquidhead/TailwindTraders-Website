@@ -87,11 +87,11 @@ stages:
                 Write-Host "Done deploying web app to iis."            
 
 - stage: DeployBackEnd
-  displayName: Back end code
+  displayName: Back end K8s Az Stack
   dependsOn: Build
   jobs:
   - deployment: DeployBackEndCode
-    displayName: Deploy back end services
+    displayName: Deploy back end services k8s 
     pool:
       name: Hosted Windows 2019 with VS2019
     variables:
@@ -129,11 +129,11 @@ stages:
                 Write-Host "Done deploying back end services."            
 
 - stage: DeployDB
-  displayName: DB schema changes
+  displayName: DB schema changes Stack
   dependsOn: Build
   jobs:
   - deployment: DeployDBSchema
-    displayName: Deploy db schema
+    displayName: Deploy db schema Stack
     pool:
       name: Hosted Windows 2019 with VS2019
     variables:
