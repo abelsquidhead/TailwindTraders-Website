@@ -278,7 +278,7 @@ stages:
 
 - stage: DeployBackEndBeta
   displayName: Deploy K8s - Beta
-  dependsOn: Build
+  dependsOn: SeleniumWebTestsDev
   jobs:
   - deployment: DeployBackEndCode
     displayName: Deploy backend to K8s
