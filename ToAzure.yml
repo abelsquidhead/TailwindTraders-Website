@@ -355,5 +355,76 @@ stages:
               targetType: 'inline'
               script: |
                 Write-Host "Helm upgrade..."
-                Start-Sleep -s 68
+                Start-Sleep -s 62
                 Write-Host "Done helm upgrade."                  
+
+
+- stage: DeployDBBeta
+  displayName: Az SQL schema changes - Beta
+  dependsOn: SeleniumWebTestsDev
+  jobs:
+  - deployment: DeployDBSchema
+    displayName: Deploy db schema
+    pool:
+      name: Hosted Windows 2019 with VS2019
+    variables:
+      adminlogin: abel
+      servername: abellearndbserverdev1
+      webAppName: abellearndbwebappdev1
+      failoverName: learndbserverfailoverdev1
+      partnerServerName: learndbserver2dev1
+      trafficManagerProfileName: abellearndbtmdev1
+      uniqueDNSName: abellearndbuniquedev1
+      storageAccountName: abellearndbstoragedev1
+    environment: 'forester-db-beta'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+            patterns: '**/*'
+          - task: PowerShell@2
+            displayName : 'Dacpac deploy'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Deploying db schema..."
+                Write-Host "Dacpac deploy..."
+                Start-Sleep -s 63
+                Write-Host "Done with Dacpac deploy."
+                Write-Host "Done deploying db schema."         
+
+- stage: SeleniumWebTestsBeta
+  displayName: Selenium Web Tests - Beta
+  dependsOn: [DeployWebFrontEndBeta, DeployBackEndBeta, DeployDBBeta]
+  jobs:
+  - deployment: SeleniumWebTestsBeta
+    displayName: Selenium Web Tests 
+    pool:
+      name: Hosted Windows 2019 with VS2019
+    variables:
+      adminlogin: abel
+      servername: abellearndbserverdev1
+      webAppName: abellearndbwebappdev1
+      failoverName: learndbserverfailoverdev1
+      partnerServerName: learndbserver2dev1
+      trafficManagerProfileName: abellearndbtmdev1
+      uniqueDNSName: abellearndbuniquedev1
+      storageAccountName: abellearndbstoragedev1
+    environment: 'forester-selenium-beta'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+            patterns: '**/*'
+          - task: PowerShell@2
+            displayName : 'Dacpac deploy'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Running selenium web ui tests..."
+                Start-Sleep -s 67
+                Write-Host "Done running selenium tests."
