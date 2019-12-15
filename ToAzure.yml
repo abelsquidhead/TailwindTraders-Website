@@ -206,7 +206,7 @@ stages:
 
 - stage: SeleniumWebTestsDev
   displayName: Selenium Web Tests - Dev
-  dependsOn: [DeployWebFrontEndDev, DeployBackEndDe, DeployDBDev]
+  dependsOn: [DeployWebFrontEndDev, DeployBackEndDev, DeployDBDev]
   jobs:
   - deployment: SeleniumWebTestsDev
     displayName: Selenium Web Tests 
