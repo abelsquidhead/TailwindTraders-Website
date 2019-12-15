@@ -34,12 +34,12 @@ stages:
     - task: NuGetCommand@2
       inputs:
         restoreSolution: 'Source/Tailwind.Traders.Web.sln'
-    - task: VSBuild@1
-      inputs:
-        solution: 'Source/Tailwind.Traders.Web.sln'
-        msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactStagingDirectory)"'
-        platform: '$(buildPlatform)'
-        configuration: '$(buildConfiguration)'
+    # - task: VSBuild@1
+    #   inputs:
+    #     solution: 'Source/Tailwind.Traders.Web.sln'
+    #     msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactStagingDirectory)"'
+    #     platform: '$(buildPlatform)'
+    #     configuration: '$(buildConfiguration)'
     # - task: VSTest@2
     #   inputs:
     #     platform: '$(buildPlatform)'
