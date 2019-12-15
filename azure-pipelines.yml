@@ -194,9 +194,7 @@ stages:
             inputs:
               targetType: 'inline'
               script: |
-                Write-Host "Deploying db schema..."
-                Write-Host "Dacpac deploy..."
+                Write-Host "Running Selenium Web Tests..."
                 Start-Sleep -s 52
-                Write-Host "Done with Dacpac deploy."
-                Write-Host "Done deploying db schema."         
+                Write-Host "Done with Selenium Web Tests."        
   

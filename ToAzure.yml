@@ -232,7 +232,7 @@ stages:
             artifact: drop
             patterns: '**/*'
           - task: PowerShell@2
-            displayName : 'Dacpac deploy'
+            displayName : 'Selenium Web Tests'
             inputs:
               targetType: 'inline'
               script: |
@@ -421,7 +421,7 @@ stages:
             artifact: drop
             patterns: '**/*'
           - task: PowerShell@2
-            displayName : 'Dacpac deploy'
+            displayName : 'Selenium Web Tests'
             inputs:
               targetType: 'inline'
               script: |
@@ -611,7 +611,7 @@ stages:
             artifact: drop
             patterns: '**/*'
           - task: PowerShell@2
-            displayName : 'Dacpac deploy'
+            displayName : 'Selenium Web Tests'
             inputs:
               targetType: 'inline'
               script: |
