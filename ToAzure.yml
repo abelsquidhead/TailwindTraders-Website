@@ -461,6 +461,161 @@ stages:
               targetType: 'inline'
               script: |
                 Write-Host "App Service deploy..."
-                Start-Sleep -s 32
+                Start-Sleep -s 38
                 Write-Host "Done deploying app service deploy."            
+
+
+
+- stage: DeployBackEndProd
+  displayName: Deploy K8s - Prod
+  dependsOn: SeleniumWebTestsBeta
+  jobs:
+  - deployment: DeployBackEndCode
+    displayName: Deploy backend to K8s
+    pool:
+      name: Hosted Windows 2019 with VS2019
+    variables:
+      adminlogin: abel
+      servername: abellearndbserverdev1
+      webAppName: abellearndbwebappdev1
+      failoverName: learndbserverfailoverdev1
+      partnerServerName: learndbserver2dev1
+      trafficManagerProfileName: abellearndbtmdev1
+      uniqueDNSName: abellearndbuniquedev1
+      storageAccountName: abellearndbstoragedev1
+    environment: 'forester-api-prod'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+            patterns: '**/*'
+          - task: PowerShell@2
+            displayName : 'Azure CLI: Preserve Cluster Tags'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Preserving cluster tags..."
+                Start-Sleep -s 1
+                Write-Host "Done preserving cluster tags."         
+          - task: PowerShell@2
+            displayName : 'Azure Deployment: Create AKS Cluster'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Creating AKS cluster..."
+                Start-Sleep -s 23
+                Write-Host "Done creating AKS cluster."            
+          - task: PowerShell@2
+            displayName : 'Extract Resource Information'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Extract Resource Information..."
+                Start-Sleep -s 1
+                Write-Host "Done extracting resource information."  
+          - task: PowerShell@2
+            displayName : 'kubectl setup tiller environment'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Setting up tiller..."
+                Start-Sleep -s 7
+                Write-Host "Done setting up tiller."                  
+          - task: PowerShell@2
+            displayName : 'Install Helm'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Installing helm..."
+                Start-Sleep -s 2
+                Write-Host "Done installing helm."                  
+          - task: PowerShell@2
+            displayName : 'Helm init'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Helm init..."
+                Start-Sleep -s 8
+                Write-Host "Done installing helm."                  
+          - task: PowerShell@2
+            displayName : 'Helm upgrade'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Helm upgrade..."
+                Start-Sleep -s 67
+                Write-Host "Done helm upgrade."                  
+
+- stage: DeployDBProd
+  displayName: Az SQL schema changes - Prod
+  dependsOn: SeleniumWebTestsBeta
+  jobs:
+  - deployment: DeployDBSchema
+    displayName: Deploy db schema
+    pool:
+      name: Hosted Windows 2019 with VS2019
+    variables:
+      adminlogin: abel
+      servername: abellearndbserverdev1
+      webAppName: abellearndbwebappdev1
+      failoverName: learndbserverfailoverdev1
+      partnerServerName: learndbserver2dev1
+      trafficManagerProfileName: abellearndbtmdev1
+      uniqueDNSName: abellearndbuniquedev1
+      storageAccountName: abellearndbstoragedev1
+    environment: 'forester-db-beta'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+            patterns: '**/*'
+          - task: PowerShell@2
+            displayName : 'Dacpac deploy'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Deploying db schema..."
+                Write-Host "Dacpac deploy..."
+                Start-Sleep -s 58
+                Write-Host "Done with Dacpac deploy."
+                Write-Host "Done deploying db schema."    
+
+
+- stage: SeleniumWebTestsProd
+  displayName: Selenium Web Tests - Prod
+  dependsOn: [DeployWebFrontEndProd, DeployBackEndProd, DeployDBProd]
+  jobs:
+  - deployment: SeleniumWebTestsProd
+    displayName: Selenium Web Tests 
+    pool:
+      name: Hosted Windows 2019 with VS2019
+    variables:
+      adminlogin: abel
+      servername: abellearndbserverdev1
+      webAppName: abellearndbwebappdev1
+      failoverName: learndbserverfailoverdev1
+      partnerServerName: learndbserver2dev1
+      trafficManagerProfileName: abellearndbtmdev1
+      uniqueDNSName: abellearndbuniquedev1
+      storageAccountName: abellearndbstoragedev1
+    environment: 'forester-selenium-prod'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+            patterns: '**/*'
+          - task: PowerShell@2
+            displayName : 'Dacpac deploy'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Running selenium web ui tests..."
+                Start-Sleep -s 68
+                Write-Host "Done running selenium tests."
 
