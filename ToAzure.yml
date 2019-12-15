@@ -274,3 +274,86 @@ stages:
                 Write-Host "App Service deploy..."
                 Start-Sleep -s 32
                 Write-Host "Done deploying app service deploy."            
+
+
+- stage: DeployBackEndBeta
+  displayName: Deploy K8s - Beta
+  dependsOn: Build
+  jobs:
+  - deployment: DeployBackEndCode
+    displayName: Deploy backend to K8s
+    pool:
+      name: Hosted Windows 2019 with VS2019
+    variables:
+      adminlogin: abel
+      servername: abellearndbserverdev1
+      webAppName: abellearndbwebappdev1
+      failoverName: learndbserverfailoverdev1
+      partnerServerName: learndbserver2dev1
+      trafficManagerProfileName: abellearndbtmdev1
+      uniqueDNSName: abellearndbuniquedev1
+      storageAccountName: abellearndbstoragedev1
+    environment: 'forester-api-beta'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+            patterns: '**/*'
+          - task: PowerShell@2
+            displayName : 'Azure CLI: Preserve Cluster Tags'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Preserving cluster tags..."
+                Start-Sleep -s 1
+                Write-Host "Done preserving cluster tags."         
+          - task: PowerShell@2
+            displayName : 'Azure Deployment: Create AKS Cluster'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Creating AKS cluster..."
+                Start-Sleep -s 23
+                Write-Host "Done creating AKS cluster."            
+          - task: PowerShell@2
+            displayName : 'Extract Resource Information'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Extract Resource Information..."
+                Start-Sleep -s 1
+                Write-Host "Done extracting resource information."  
+          - task: PowerShell@2
+            displayName : 'kubectl setup tiller environment'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Setting up tiller..."
+                Start-Sleep -s 7
+                Write-Host "Done setting up tiller."                  
+          - task: PowerShell@2
+            displayName : 'Install Helm'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Installing helm..."
+                Start-Sleep -s 2
+                Write-Host "Done installing helm."                  
+          - task: PowerShell@2
+            displayName : 'Helm init'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Helm init..."
+                Start-Sleep -s 8
+                Write-Host "Done installing helm."                  
+          - task: PowerShell@2
+            displayName : 'Helm upgrade'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "Helm upgrade..."
+                Start-Sleep -s 68
+                Write-Host "Done helm upgrade."                  
