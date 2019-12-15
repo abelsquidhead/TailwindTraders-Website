@@ -428,3 +428,39 @@ stages:
                 Write-Host "Running selenium web ui tests..."
                 Start-Sleep -s 67
                 Write-Host "Done running selenium tests."
+
+
+- stage: DeployWebFrontEndProd
+  displayName: Deploy App Service - Prod
+  dependsOn: SeleniumWebTestsBeta
+  jobs:
+  - deployment: DeployWebFrontEnd
+    displayName: Deploy web to App Service
+    pool:
+      name: Hosted Windows 2019 with VS2019
+    variables:
+      adminlogin: abel
+      servername: abellearndbserverdev1
+      webAppName: abellearndbwebappdev1
+      failoverName: learndbserverfailoverdev1
+      partnerServerName: learndbserver2dev1
+      trafficManagerProfileName: abellearndbtmdev1
+      uniqueDNSName: abellearndbuniquedev1
+      storageAccountName: abellearndbstoragedev1
+    environment: 'forester-web-beta'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+            patterns: '**/*'
+          - task: PowerShell@2
+            displayName : 'Deploy web to App Service'
+            inputs:
+              targetType: 'inline'
+              script: |
+                Write-Host "App Service deploy..."
+                Start-Sleep -s 32
+                Write-Host "Done deploying app service deploy."            
+
