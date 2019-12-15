@@ -207,7 +207,7 @@ stages:
                 Write-Host "Done deploying db schema."         
 
 - stage: SeleniumWebTestsStack
-  displayName: Selenium Web Tests - Dev
+  displayName: Selenium Web Tests - Stack
   dependsOn: [DeployWebFrontEndStack, DeployBackEndStack, DeployDBStack]
   jobs:
   - deployment: SeleniumWebTestsStack
