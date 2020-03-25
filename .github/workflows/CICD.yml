@@ -106,7 +106,7 @@ jobs:
         env:
           SERVICE_PRINCIPAL: http://AbelDeployDemoPrincipal
           SERVICE_PRINCIPAL_TENANT: 72f988bf-86f1-41af-91ab-2d7cd011db47
-          RESOURCE_GROUP: TailwindTraders-Web-Ignite-RG
+          RESOURCE_GROUP: TailwindTraders-Web-RG
           WEB_APP_NAME: abeltailwindtraders
           PATH_TO_WEBSITE_ZIP: .\webapp\Tailwind.Traders.web.zip
         run: >
