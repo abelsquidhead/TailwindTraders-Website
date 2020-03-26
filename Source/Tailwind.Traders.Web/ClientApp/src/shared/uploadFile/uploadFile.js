@@ -22,14 +22,14 @@ class UploadFile extends Component {
             .then((relatedProducts) => {
                 if (relatedProducts.length > 1) {
                     this.props.history.push({
-                        pathname: "/suggested-products-list",
+                        pathname: "suggested-products-list",
                         state: { relatedProducts },
                     });
                 }else {
                     this.props.history.push({
                         pathname: `/product/details/${relatedProducts[0].id}`,
                     });
-                }  
+                }     
             })
             .catch(() => {
                 Alert.error("There was an error uploading the image, please try again", {
